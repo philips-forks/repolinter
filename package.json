@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "ajv": "^6.12.6",
-    "broken-link-checker": "github:prototypicalpro/broken-link-checker#master",
+    "broken-link-checker": "github:prototypicalpro/broken-link-checker#7032781fe8768da4943f8757de6825cab83432c4",
     "chalk": "^4.1.0",
     "command-exists": "^1.2.9",
     "emoji-regex": "^9.2.0",
