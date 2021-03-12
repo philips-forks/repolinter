@@ -1,5 +1,5 @@
 name: Create SPDX Overview
-on: [workflow_dispatch]
+on: [push]
 
 jobs:
   generate-spdx:
