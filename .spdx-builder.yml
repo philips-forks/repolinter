@@ -1,0 +1,7 @@
+document:
+  title: "Repolinter"
+  organization: "Philips Research"
+  comment: "Test SPDX Builder File"
+projects:
+  - id: NPM::repolinter:0.10.0
+    purl: "git+https://git.github.com/philips-labs/repolinter@0.10.0"
