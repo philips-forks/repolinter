@@ -261,7 +261,7 @@
                   },
                   "then": {
                     "properties": {
-                      "options": { "$ref": "https://raw.githubusercontent.com/todogroup/repolinter/feature/github-issue-fix/fixes/github-issue-create-config.json" }
+                      "options": { "$ref": "https://raw.githubusercontent.com/philips-labs/repolinter/master/fixes/github-issue-create-config.json" }
                     }
                   }
                 }
