@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "https://raw.githubusercontent.com/philips-labs/repolinter/feature/github-issue-fix/fixes/github-issue-create-config.json",
+  "$id": "https://raw.githubusercontent.com/philips-labs/repolinter/master/fixes/github-issue-create-config.json",
   "type": "object",
   "properties": {
     "issueLabels": {
@@ -22,6 +22,10 @@
     },
     "uniqueRuleId": {
       "type": "string"
+    },
+    "assignIssue": {
+      "type": "boolean",
+      "default": "false"
     }
   },
   "required": ["issueLabels", "bypassLabel", "issueBody", "commentBody", "issueTitle", "uniqueRuleId"]

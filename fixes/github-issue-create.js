@@ -8,6 +8,8 @@ const { Octokit } = require('@octokit/rest')
 let targetOrg = ''
 let targetRepository = ''
 
+// Get top level contributors https://api.github.com/repos/philips-labs/repolinter/contributors?q=contributions&order=desc
+
 /**
  * Create a Github Issue on the targeted repository specifically for this broken rule.
  *
