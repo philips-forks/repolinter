@@ -265,6 +265,16 @@
               
                 
                 <li><a
+                  href='#decodeconfig'
+                  class="">
+                  decodeConfig
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#resulttarget'
                   class="">
                   ResultTarget
@@ -2103,7 +2113,7 @@ at the top of the markdown document.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>lint(targetDir, filterPaths = [], ruleset = null, dryRun = false)</span>
+            <span class='code strong strong truncate'>lint(targetDir, filterPaths = [], ruleset = null, encodedIsUsed = false, dryRun = false)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -2119,7 +2129,7 @@ a custom ruleset object to use. This function will not throw
 an error on failure, instead indicating that an error has
 ocurred in returned value.</p>
 
-    <div class='pre p1 fill-light mt0'>lint(targetDir: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, filterPaths: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>?, ruleset: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | null)?, dryRun: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="#lintresult">LintResult</a>></div>
+    <div class='pre p1 fill-light mt0'>lint(targetDir: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, filterPaths: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>?, ruleset: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | null)?, encodedIsUsed: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?, dryRun: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="#lintresult">LintResult</a>></div>
   
   
 
@@ -2159,6 +2169,16 @@ ocurred in returned value.</p>
             = <code>null</code>)</code>
 	    A custom ruleset object with the same structure as the JSON ruleset configs, or a string path to a JSON config.
 Set to null for repolinter to automatically find it in the repository.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>encodedIsUsed</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>?
+            = <code>false</code>)</code>
+	    If true, repolinter expects base64 encoded string in the ruleset, we will decode the base64 encoded ruleset.
 
           </div>
           
@@ -4563,6 +4583,96 @@ returned.</p>
           <div>
             <span class='code bold'>configLocation</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    A URL or local file containing a repolinter config file
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>processed</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">array</a>?
+            = <code>[]</code>)</code>
+	    List of config files already processed, used to prevent loops
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+        The loaded repolinter json config
+
+      
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Throws</div>
+    <ul>
+      
+        <li>any: Will throw an error if unable to parse config or if config is invalid
+</li>
+      
+    </ul>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='decodeconfig'>
+      decodeConfig
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Decodes a base64 encoded string into a config</p>
+
+    <div class='pre p1 fill-light mt0'>decodeConfig(encodedRuleSet: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, processed: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">array</a>?): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>encodedRuleSet</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    A base64 encoded string that needs decoding
 
           </div>
           
