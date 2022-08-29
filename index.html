@@ -862,6 +862,7 @@ relative to the original file path as <code>/etc/repolinter/default.yaml</code>.
 <li><a href="#json-schema-passes"><code>json-schema-passes</code></a></li>
 <li><a href="#license-detectable-by-licensee"><code>license-detectable-by-licensee</code></a></li>
 <li><a href="#best-practices-badge-present"><code>best-practices-badge-present</code></a></li>
+<li><a href="#any-file-contents"><code>any-file-contents</code></a></li>
 </ul>
 </li>
 </ul>
@@ -1477,6 +1478,63 @@ a bit time consuming, depending on the size of the Git history.</p>
 <td><code>integer</code></td>
 <td><code>null</code></td>
 <td>Minimum <a href="https://github.com/coreinfrastructure/best-practices-badge/blob/main/doc/api.md#tiered-percentage-in-openssf-best-practices-badge">Tiered Percentage</a> accomplished by project. <code>passing=100</code>, <code>silver=200</code>, <code>gold=300</code>, set to <code>0</code> or <code>null</code> to disable check.</td>
+</tr>
+</tbody>
+</table>
+<h3><code>any-file-contents</code></h3>
+<p>Checks if the contents of at least one file in a given list match a given regular expression.</p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Required</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>globsAny</code></td>
+<td><strong>Yes</strong></td>
+<td><code>string[]</code></td>
+<td></td>
+<td>A list of globs to get files for. This rule passes if at least one of the files returned by the globs match the supplied string, or if no files are returned.</td>
+</tr>
+<tr>
+<td><code>content</code></td>
+<td><strong>Yes</strong></td>
+<td><code>string</code></td>
+<td></td>
+<td>The regular expression to check using <code>String#search</code>. This expression should not include the enclosing slashes and may need to be escaped to properly integrate with the JSON config (ex. <code>".+@.+\\..+"</code> for an email address).</td>
+</tr>
+<tr>
+<td><code>nocase</code></td>
+<td>No</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Set to <code>true</code> to make the globs case insensitive. This does not effect the case sensitivity of the regular expression.</td>
+</tr>
+<tr>
+<td><code>flags</code></td>
+<td>No</td>
+<td><code>string</code></td>
+<td><code>""</code></td>
+<td>The flags to use for the regular expression in <code>content</code> (ex. <code>"i"</code> for case insensitivity).</td>
+</tr>
+<tr>
+<td><code>human-readable-content</code></td>
+<td>No</td>
+<td><code>string</code></td>
+<td>The regular expression in <code>content</code></td>
+<td>The string to print instead of the regular expression when generating human-readable output.</td>
+</tr>
+<tr>
+<td><code>fail-on-non-existent</code></td>
+<td>No</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Set to <code>true</code> to disable passing if no files are found from <code>globsAll</code>.</td>
 </tr>
 </tbody>
 </table>
