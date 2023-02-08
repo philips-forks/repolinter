@@ -424,6 +424,15 @@
   
     <h1><img src="https://raw.githubusercontent.com/todogroup/repolinter/master/docs/images/P_RepoLinter01_logo_only.png" alt="Repo Linter"> <img src="https://github.com/todogroup/repolinter/workflows/Build/badge.svg" alt="Build Status"></h1>
 <p>Lint open source repositories for common issues.</p>
+<h2>Changes in this fork</h2>
+<ul>
+<li>Possibility to create a GitHub Issue per rule violation (<a href="https://github.com/philips-forks/repolinter/pull/1">https://github.com/philips-forks/repolinter/pull/1</a>)</li>
+<li>Ability to dynamically pass a ruleset using base64 encoded string (<a href="https://github.com/philips-forks/repolinter/pull/7">https://github.com/philips-forks/repolinter/pull/7</a>)</li>
+<li>New rule that checks whether a file or directory exists (file-or-directory-existence, <a href="https://github.com/philips-forks/repolinter/pull/19">https://github.com/philips-forks/repolinter/pull/19</a>)</li>
+<li>New rule that checks if content exists within a file (any-file-contents, <a href="https://github.com/philips-forks/repolinter/pull/18">https://github.com/philips-forks/repolinter/pull/18</a>)</li>
+<li>Minor optimization if you have a very large repository (lots of commits) so it doesn't do a full checkout. (<a href="https://github.com/philips-forks/repolinter/pull/12">https://github.com/philips-forks/repolinter/pull/12</a>)</li>
+</ul>
+<p>We are working on getting (some) of these changes merged back into upstream. Time is a limiting factor here..</p>
 <h2>Installation</h2>
 <p>Repolinter requires <a href="https://nodejs.org/en/">Node.JS</a> >= v10 to function properly. Once Node.JS is installed, you can install Repolinter using <code>npm</code>:</p>
 <pre class='hljs'>npm install -g repolinter</pre>
