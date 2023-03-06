@@ -7,7 +7,7 @@ const InternalHelpers = require('./helpers/github-issue-create-helpers')
 const { Octokit } = require('@octokit/rest')
 let targetOrg = ''
 let targetRepository = ''
-const issuesAssignees = new Array(0)
+let issuesAssignees = new Array(0)
 
 /**
  * Create a Github Issue on the targeted repository specifically for this broken rule.
@@ -47,17 +47,19 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
       this.Octokit
     )
 
+    let assignees = []
+    let assigneeSelectCount = 0
     // Retrieve committers of a repository if option is enabled
     if (options.assignTopCommitter === undefined) {
       options.assignTopCommitter = true
     }
     if (options.assignTopCommitter) {
-      const assignees = await getTopCommittersOfRepository(
+      assignees = await getTopCommittersOfRepository(
         targetOrg,
         targetRepository
       )
       if (assignees !== undefined && assignees.data.length > 0) {
-        issuesAssignees.push(assignees.data[0].login)
+        issuesAssignees.push(assignees.data[assigneeSelectCount].login)
       }
     }
 
@@ -65,7 +67,26 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
     // If there are issues, we loop through them and handle each each on it's own
     if (issues === null || issues === undefined) {
       // Issue should include the broken rule, a message in the body and a label.
-      const createdIssue = await createIssueOnGithub(options)
+      const createdIssue = await createIssueOnGithub(options).catch(error => {
+        if (
+          error.status === 422 &&
+          error.message.indexOf('Validation Failed: ') !== -1 &&
+          error.message.indexOf('"field":"assignees","code":"invalid"}')
+        ) {
+          issuesAssignees = []
+          if (assigneeSelectCount <= assignees.data.length) {
+            assigneeSelectCount++
+            issuesAssignees.push(assignees.data[assigneeSelectCount].login)
+          }
+          return createIssueOnGithub(options)
+        } else {
+          return new Result(
+            `Something went wrong when trying to create the issue: ${error.message}`,
+            [],
+            false
+          )
+        }
+      })
       // We are done here, we created a new issue.
       return new Result(
         `No Open/Closed issues were found for this rule - Created new Github Issue with issue number - ${createdIssue.data.number}`,
@@ -136,7 +157,26 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
     }
     // There are open/closed issues from Continuous Compliance, but non of them are for this ruleset
     // Issue should include the broken rule, a message in the body and a label.
-    const newIssue = await createIssueOnGithub(options)
+    const newIssue = await createIssueOnGithub(options).catch(error => {
+      if (
+        error.status === 422 &&
+        error.message.indexOf('Validation Failed: ') !== -1 &&
+        error.message.indexOf('"field":"assignees","code":"invalid"}')
+      ) {
+        issuesAssignees = []
+        if (assigneeSelectCount <= assignees.data.length) {
+          assigneeSelectCount++
+          issuesAssignees.push(assignees.data[assigneeSelectCount].login)
+        }
+        return createIssueOnGithub(options)
+      } else {
+        return new Result(
+          `Something went wrong when trying to create the issue: ${error.message}`,
+          [],
+          false
+        )
+      }
+    })
     return new Result(
       `Github Issue ${newIssue.data.number} Created!`,
       targets,
@@ -175,18 +215,14 @@ async function getTopCommittersOfRepository(targetOrg, targetRepository) {
  * @returns {object} Returns issue after adding it via the Github API.
  */
 async function createIssueOnGithub(options) {
-  try {
-    return await this.Octokit.request('POST /repos/{owner}/{repo}/issues', {
-      owner: targetOrg,
-      repo: targetRepository,
-      title: options.issueTitle,
-      body: InternalHelpers.generateIssueBody(options),
-      labels: options.issueLabels,
-      assignees: issuesAssignees
-    })
-  } catch (e) {
-    console.error(e)
-  }
+  return await this.Octokit.request('POST /repos/{owner}/{repo}/issues', {
+    owner: targetOrg,
+    repo: targetRepository,
+    title: options.issueTitle,
+    body: InternalHelpers.generateIssueBody(options),
+    labels: options.issueLabels,
+    assignees: issuesAssignees
+  })
 }
 /**
  * Update specific issue on Github.

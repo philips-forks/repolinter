@@ -76,7 +76,7 @@ async function ensureAddedGithubLabels(
  * @param {string} targetOrg Organization/Owner of the repository.
  * @param {string} repo Name of the repository.
  * @param {string} label Label to check for.
- * @param {object} octoKit Instance of Octokit used to call Github API.
+ * @param {object} octoKit Instance of Octokit used to call GitHub API.
  * @returns {boolean} True if label is found, false otherwise.
  */
 async function doesLabelExistOnRepo(targetOrg, repo, label, octokit) {
