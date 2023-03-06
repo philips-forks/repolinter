@@ -74,7 +74,10 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
           error.message.indexOf('"field":"assignees","code":"invalid"}')
         ) {
           issuesAssignees = []
-          if (assigneeSelectCount <= assignees.data.length) {
+          if (
+            assigneeSelectCount <= assignees.data.length &&
+            assigneeSelectCount <= 6
+          ) {
             assigneeSelectCount++
             issuesAssignees.push(assignees.data[assigneeSelectCount].login)
           }
@@ -122,7 +125,10 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
                 error.message.indexOf('"field":"assignees","code":"invalid"}')
               ) {
                 issuesAssignees = []
-                if (assigneeSelectCount <= assignees.data.length) {
+                if (
+                  assigneeSelectCount <= assignees.data.length &&
+                  assigneeSelectCount <= 6
+                ) {
                   assigneeSelectCount++
                   issuesAssignees.push(
                     assignees.data[assigneeSelectCount].login
@@ -169,7 +175,10 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
               error.message.indexOf('"field":"assignees","code":"invalid"}')
             ) {
               issuesAssignees = []
-              if (assigneeSelectCount <= assignees.data.length) {
+              if (
+                assigneeSelectCount <= assignees.data.length &&
+                assigneeSelectCount <= 6
+              ) {
                 assigneeSelectCount++
                 issuesAssignees.push(assignees.data[assigneeSelectCount].login)
               }
@@ -204,7 +213,10 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
         error.message.indexOf('"field":"assignees","code":"invalid"}')
       ) {
         issuesAssignees = []
-        if (assigneeSelectCount <= assignees.data.length) {
+        if (
+          assigneeSelectCount <= assignees.data.length &&
+          assigneeSelectCount <= 6
+        ) {
           assigneeSelectCount++
           issuesAssignees.push(assignees.data[assigneeSelectCount].login)
         }
