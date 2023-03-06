@@ -115,7 +115,28 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
             issue.title !== options.issueTitle ||
             (issue.assignees.length === 0 && options.assignTopCommitter)
           ) {
-            await updateIssueOnGithub(options, issue.number)
+            await updateIssueOnGithub(options, issue.number).catch(error => {
+              if (
+                error.status === 422 &&
+                error.message.indexOf('Validation Failed: ') !== -1 &&
+                error.message.indexOf('"field":"assignees","code":"invalid"}')
+              ) {
+                issuesAssignees = []
+                if (assigneeSelectCount <= assignees.data.length) {
+                  assigneeSelectCount++
+                  issuesAssignees.push(
+                    assignees.data[assigneeSelectCount].login
+                  )
+                }
+                return updateIssueOnGithub(options, issue.number)
+              } else {
+                return new Result(
+                  `Something went wrong when trying to update the issue: ${error.message}`,
+                  [],
+                  false
+                )
+              }
+            })
           }
           return new Result(
             `No Github Issue Created - Issue already exists with correct unique identifier`,
@@ -141,7 +162,26 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
             true
           )
         } else {
-          await updateIssueOnGithub(options, issue.number)
+          await updateIssueOnGithub(options, issue.number).catch(error => {
+            if (
+              error.status === 422 &&
+              error.message.indexOf('Validation Failed: ') !== -1 &&
+              error.message.indexOf('"field":"assignees","code":"invalid"}')
+            ) {
+              issuesAssignees = []
+              if (assigneeSelectCount <= assignees.data.length) {
+                assigneeSelectCount++
+                issuesAssignees.push(assignees.data[assigneeSelectCount].login)
+              }
+              return updateIssueOnGithub(options, issue.number)
+            } else {
+              return new Result(
+                `Something went wrong when trying to update the issue: ${error.message}`,
+                [],
+                false
+              )
+            }
+          })
           await commentOnGithubIssue(options, issue.number)
           return new Result(
             `Github Issue ${issue.number} re-opened as there seems to be regression!`,
