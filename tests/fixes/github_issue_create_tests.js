@@ -2,7 +2,6 @@ const { expect } = require('chai')
 const nock = require('nock')
 const { Octokit } = require('@octokit/rest')
 require('../../fixes/github-issue-create')
-require('../../fixes/github-issue-create')
 const Result = require('../../lib/result')
 function mockStandardGithubApiCalls(
   repoIssues,
