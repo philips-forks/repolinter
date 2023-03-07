@@ -48,7 +48,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
     )
 
     let assignees = []
-    let assigneeSelectCount = 0
+    const assigneeSelectCount = 0
     // Retrieve committers of a repository if option is enabled
     if (options.assignTopCommitter === undefined) {
       options.assignTopCommitter = true
@@ -66,36 +66,26 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
     // If there are no issues, create one.
     // If there are issues, we loop through them and handle each each on it's own
     if (issues === null || issues === undefined) {
-      // Issue should include the broken rule, a message in the body and a label.
-      const createdIssue = await createIssueOnGithub(options).catch(error => {
-        if (
-          error.status === 422 &&
-          error.message.indexOf('Validation Failed: ') !== -1 &&
-          error.message.indexOf('"field":"assignees","code":"invalid"}')
-        ) {
-          issuesAssignees = []
-          if (
-            assigneeSelectCount <= assignees.data.length &&
-            assigneeSelectCount <= 6
-          ) {
-            assigneeSelectCount++
-            issuesAssignees.push(assignees.data[assigneeSelectCount].login)
-          }
-          return createIssueOnGithub(options)
-        } else {
-          return new Result(
-            `Something went wrong when trying to create the issue: ${error.message}`,
-            [],
-            false
-          )
-        }
-      })
-      // We are done here, we created a new issue.
-      return new Result(
-        `No Open/Closed issues were found for this rule - Created new Github Issue with issue number - ${createdIssue.data.number}`,
-        [],
-        true
-      )
+      try {
+        // Issue should include the broken rule, a message in the body and a label.
+        const createdIssue = await createIssueOnGithub(
+          options,
+          assigneeSelectCount,
+          assignees
+        )
+        // We are done here, we created a new issue.
+        return new Result(
+          `No Open/Closed issues were found for this rule - Created new Github Issue with issue number - ${createdIssue.data.number}`,
+          [],
+          true
+        )
+      } catch (e) {
+        return new Result(
+          `Something went wrong when trying to create the issue: ${e.message}`,
+          [],
+          false
+        )
+      }
     }
 
     const openIssues = issues.filter(issue => issue.state === 'open')
@@ -118,31 +108,21 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
             issue.title !== options.issueTitle ||
             (issue.assignees.length === 0 && options.assignTopCommitter)
           ) {
-            await updateIssueOnGithub(options, issue.number).catch(error => {
-              if (
-                error.status === 422 &&
-                error.message.indexOf('Validation Failed: ') !== -1 &&
-                error.message.indexOf('"field":"assignees","code":"invalid"}')
-              ) {
-                issuesAssignees = []
-                if (
-                  assigneeSelectCount <= assignees.data.length &&
-                  assigneeSelectCount <= 6
-                ) {
-                  assigneeSelectCount++
-                  issuesAssignees.push(
-                    assignees.data[assigneeSelectCount].login
-                  )
-                }
-                return updateIssueOnGithub(options, issue.number)
-              } else {
-                return new Result(
-                  `Something went wrong when trying to update the issue: ${error.message}`,
-                  [],
-                  false
-                )
-              }
-            })
+            try {
+              // Issue should include the broken rule, a message in the body and a label.
+              await updateIssueOnGithub(
+                options,
+                issue.number,
+                assigneeSelectCount,
+                assignees
+              )
+            } catch (e) {
+              return new Result(
+                `Something went wrong when trying to update issue id: ${issue.number}: ${e.message}`,
+                [],
+                false
+              )
+            }
           }
           return new Result(
             `No Github Issue Created - Issue already exists with correct unique identifier`,
@@ -168,29 +148,21 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
             true
           )
         } else {
-          await updateIssueOnGithub(options, issue.number).catch(error => {
-            if (
-              error.status === 422 &&
-              error.message.indexOf('Validation Failed: ') !== -1 &&
-              error.message.indexOf('"field":"assignees","code":"invalid"}')
-            ) {
-              issuesAssignees = []
-              if (
-                assigneeSelectCount <= assignees.data.length &&
-                assigneeSelectCount <= 6
-              ) {
-                assigneeSelectCount++
-                issuesAssignees.push(assignees.data[assigneeSelectCount].login)
-              }
-              return updateIssueOnGithub(options, issue.number)
-            } else {
-              return new Result(
-                `Something went wrong when trying to update the issue: ${error.message}`,
-                [],
-                false
-              )
-            }
-          })
+          try {
+            // Issue should include the broken rule, a message in the body and a label.
+            await updateIssueOnGithub(
+              options,
+              issue.number,
+              assigneeSelectCount,
+              assignees
+            )
+          } catch (e) {
+            return new Result(
+              `Something went wrong when trying to update issue id: ${issue.number}: ${e.message}`,
+              [],
+              false
+            )
+          }
           await commentOnGithubIssue(options, issue.number)
           return new Result(
             `Github Issue ${issue.number} re-opened as there seems to be regression!`,
@@ -206,34 +178,26 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
     }
     // There are open/closed issues from Continuous Compliance, but non of them are for this ruleset
     // Issue should include the broken rule, a message in the body and a label.
-    const newIssue = await createIssueOnGithub(options).catch(error => {
-      if (
-        error.status === 422 &&
-        error.message.indexOf('Validation Failed: ') !== -1 &&
-        error.message.indexOf('"field":"assignees","code":"invalid"}')
-      ) {
-        issuesAssignees = []
-        if (
-          assigneeSelectCount <= assignees.data.length &&
-          assigneeSelectCount <= 6
-        ) {
-          assigneeSelectCount++
-          issuesAssignees.push(assignees.data[assigneeSelectCount].login)
-        }
-        return createIssueOnGithub(options)
-      } else {
-        return new Result(
-          `Something went wrong when trying to create the issue: ${error.message}`,
-          [],
-          false
-        )
-      }
-    })
-    return new Result(
-      `Github Issue ${newIssue.data.number} Created!`,
-      targets,
-      true
-    )
+    try {
+      // Issue should include the broken rule, a message in the body and a label.
+      const newIssue = await createIssueOnGithub(
+        options,
+        assigneeSelectCount,
+        assignees
+      )
+      // We are done here, we created a new issue.
+      return new Result(
+        `Github Issue ${newIssue.data.number} Created!`,
+        targets,
+        true
+      )
+    } catch (e) {
+      return new Result(
+        `Something went wrong when trying to create the issue: ${e.message}`,
+        [],
+        false
+      )
+    }
   } catch (e) {
     console.error(e)
   }
@@ -261,12 +225,16 @@ async function getTopCommittersOfRepository(targetOrg, targetRepository) {
 }
 
 /**
- * Create an issue on Github with labels and all on the target repository.
+ * Create an issue on GitHub with labels and all on the target repository.
  *
  * @param {object} options The rule configuration.
- * @returns {object} Returns issue after adding it via the Github API.
+ * @param {number} assigneeSelectCount counter for which assignee was selected
+ * @param {array<object>} assignees array of contributors
+ * @returns {object} Returns issue after adding it via the GitHub API.
  */
-async function createIssueOnGithub(options) {
+async function createIssueOnGithub(options, assigneeSelectCount, assignees) {
+  // This might not be needed
+  let tempAssigneeSelectCount = assigneeSelectCount
   return await this.Octokit.request('POST /repos/{owner}/{repo}/issues', {
     owner: targetOrg,
     repo: targetRepository,
@@ -274,6 +242,24 @@ async function createIssueOnGithub(options) {
     body: InternalHelpers.generateIssueBody(options),
     labels: options.issueLabels,
     assignees: issuesAssignees
+  }).catch(error => {
+    if (
+      error.status === 422 &&
+      error.message.indexOf('Validation Failed: ') !== -1 &&
+      error.message.indexOf('"field":"assignees","code":"invalid"}')
+    ) {
+      issuesAssignees = []
+      if (
+        tempAssigneeSelectCount <= assignees.data.length &&
+        tempAssigneeSelectCount <= 6
+      ) {
+        tempAssigneeSelectCount++
+        issuesAssignees.push(assignees.data[tempAssigneeSelectCount].login)
+      }
+      return createIssueOnGithub(options, tempAssigneeSelectCount, assignees)
+    } else {
+      return Promise.reject(error)
+    }
   })
 }
 /**
@@ -281,29 +267,57 @@ async function createIssueOnGithub(options) {
  *
  * @param {object} options The rule configuration.
  * @param {string} issueNumber The number of the issue we should update.
+ * @param {number} assigneeSelectCount counter for which assignee was selected
+ * @param {array<object>} assignees array of contributors
  * @returns {object} Returns issue after updating it via the Github API.
  */
-async function updateIssueOnGithub(options, issueNumber) {
-  try {
-    const issueBodyWithId = options.issueBody.concat(
-      `\n Unique rule set ID: ${options.uniqueRuleId}`
-    )
-    return await this.Octokit.request(
-      'PATCH /repos/{owner}/{repo}/issues/{issue_number}',
-      {
-        owner: targetOrg,
-        repo: targetRepository,
-        issue_number: issueNumber,
-        title: options.issueTitle,
-        body: issueBodyWithId,
-        labels: options.issueLabels,
-        assignees: issuesAssignees,
-        state: 'open'
+async function updateIssueOnGithub(
+  options,
+  issueNumber,
+  assigneeSelectCount,
+  assignees
+) {
+  // This might not be needed
+  let tempAssigneeSelectCount = assigneeSelectCount
+  const issueBodyWithId = options.issueBody.concat(
+    `\n Unique rule set ID: ${options.uniqueRuleId}`
+  )
+  return await this.Octokit.request(
+    'PATCH /repos/{owner}/{repo}/issues/{issue_number}',
+    {
+      owner: targetOrg,
+      repo: targetRepository,
+      issue_number: issueNumber,
+      title: options.issueTitle,
+      body: issueBodyWithId,
+      labels: options.issueLabels,
+      assignees: issuesAssignees,
+      state: 'open'
+    }
+  ).catch(error => {
+    if (
+      error.status === 422 &&
+      error.message.indexOf('Validation Failed: ') !== -1 &&
+      error.message.indexOf('"field":"assignees","code":"invalid"}')
+    ) {
+      issuesAssignees = []
+      if (
+        tempAssigneeSelectCount <= assignees.data.length &&
+        tempAssigneeSelectCount <= 6
+      ) {
+        tempAssigneeSelectCount++
+        issuesAssignees.push(assignees.data[tempAssigneeSelectCount].login)
       }
-    )
-  } catch (e) {
-    console.error(e)
-  }
+      return updateIssueOnGithub(
+        options,
+        issueNumber,
+        tempAssigneeSelectCount,
+        assignees
+      )
+    } else {
+      return Promise.reject(error)
+    }
+  })
 }
 
 /**
