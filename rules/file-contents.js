@@ -29,9 +29,6 @@ async function fileContents(fs, options, not = false, any = false, git) {
 
   if (git === undefined) {
     git = simpleGit({
-      progress({ method, stage, progress }) {
-        console.log(`git.${method} ${stage} stage ${progress}% complete`)
-      },
       baseDir: fs.targetDir
     })
   }
