@@ -8,6 +8,7 @@ const { Octokit } = require('@octokit/rest')
 let targetOrg = ''
 let targetRepository = ''
 let issuesAssignees = new Array(0)
+const maxAssigneeRetryCount = 5
 
 /**
  * Create a Github Issue on the targeted repository specifically for this broken rule.
@@ -48,7 +49,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
     )
 
     let assignees = []
-    // Retrieve committers of a repository if option is enabled
+    // Retrieve committers of a repository if assignTopCommitter option is set or undefined.
     if (options.assignTopCommitter === undefined) {
       options.assignTopCommitter = true
     }
@@ -230,12 +231,15 @@ async function createIssueOnGithub(options, assigneeSelectCount, assignees) {
     ) {
       issuesAssignees = []
       if (
-        assigneeSelectCount <= assignees.data.length &&
-        assigneeSelectCount <= 6
+        assigneeSelectCount < assignees.data.length &&
+        assigneeSelectCount <= maxAssigneeRetryCount
       ) {
         assigneeSelectCount++
         issuesAssignees.push(assignees.data[assigneeSelectCount].login)
       }
+      console.log(
+        `Create issue for ${assignees.data[assigneeSelectCount].login}`
+      )
       return createIssueOnGithub(options, assigneeSelectCount, assignees)
     } else {
       return Promise.reject(error)
@@ -282,7 +286,7 @@ async function updateIssueOnGithub(
       issuesAssignees = []
       if (
         assigneeSelectCount <= assignees.data.length &&
-        assigneeSelectCount <= 6
+        assigneeSelectCount <= maxAssigneeRetryCount
       ) {
         assigneeSelectCount++
         issuesAssignees.push(assignees.data[assigneeSelectCount].login)
