@@ -60,11 +60,8 @@ RUN apt-get remove -y $BUILD_DEPS && \
 # move the rest of the project over
 COPY . .
 
-# make sure all git repositories are safe
-RUN git config --global --add safe.directory .
-
 # Configure bundler
 ENV BUNDLE_GEMFILE=/app/Gemfile
 ENV BUNDLE_PATH=/app/vendor/bundle
 
-ENTRYPOINT ["bundle", "exec", "/app/bin/repolinter.js"]
+ENTRYPOINT ["entrypoint.sh"]
