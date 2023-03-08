@@ -74,7 +74,7 @@ async function fileContents(fs, options, not = false, any = false, git) {
         const passed = fileContents.search(regexp) >= 0
         const message = `${
           passed ? 'Contains' : "Doesn't contain"
-        } ${getContent(options)}`
+        } ${getContent(options)} + branch: ${branch}`
 
         return {
           passed: not ? !passed : passed,
