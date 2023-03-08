@@ -48,7 +48,6 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
     )
 
     let assignees = []
-    const assigneeSelectCount = 0
     // Retrieve committers of a repository if option is enabled
     if (options.assignTopCommitter === undefined) {
       options.assignTopCommitter = true
@@ -59,7 +58,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
         targetRepository
       )
       if (assignees !== undefined && assignees.data.length > 0) {
-        issuesAssignees.push(assignees.data[assigneeSelectCount].login)
+        issuesAssignees.push(assignees.data[0].login)
       }
     }
 
@@ -68,11 +67,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
     if (issues === null || issues === undefined) {
       try {
         // Issue should include the broken rule, a message in the body and a label.
-        const createdIssue = await createIssueOnGithub(
-          options,
-          assigneeSelectCount,
-          assignees
-        )
+        const createdIssue = await createIssueOnGithub(options, 0, assignees)
         // We are done here, we created a new issue.
         return new Result(
           `No Open/Closed issues were found for this rule - Created new Github Issue with issue number - ${createdIssue.data.number}`,
@@ -110,12 +105,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
           ) {
             try {
               // Issue should include the broken rule, a message in the body and a label.
-              await updateIssueOnGithub(
-                options,
-                issue.number,
-                assigneeSelectCount,
-                assignees
-              )
+              await updateIssueOnGithub(options, issue.number, 0, assignees)
             } catch (e) {
               return new Result(
                 `Something went wrong when trying to update issue id: ${issue.number}: ${e.message}`,
@@ -150,12 +140,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
         } else {
           try {
             // Issue should include the broken rule, a message in the body and a label.
-            await updateIssueOnGithub(
-              options,
-              issue.number,
-              assigneeSelectCount,
-              assignees
-            )
+            await updateIssueOnGithub(options, issue.number, 0, assignees)
           } catch (e) {
             return new Result(
               `Something went wrong when trying to update issue id: ${issue.number}: ${e.message}`,
@@ -180,11 +165,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
     // Issue should include the broken rule, a message in the body and a label.
     try {
       // Issue should include the broken rule, a message in the body and a label.
-      const newIssue = await createIssueOnGithub(
-        options,
-        assigneeSelectCount,
-        assignees
-      )
+      const newIssue = await createIssueOnGithub(options, 0, assignees)
       // We are done here, we created a new issue.
       return new Result(
         `Github Issue ${newIssue.data.number} Created!`,
@@ -234,7 +215,6 @@ async function getTopCommittersOfRepository(targetOrg, targetRepository) {
  */
 async function createIssueOnGithub(options, assigneeSelectCount, assignees) {
   // This might not be needed
-  let tempAssigneeSelectCount = assigneeSelectCount
   return await this.Octokit.request('POST /repos/{owner}/{repo}/issues', {
     owner: targetOrg,
     repo: targetRepository,
@@ -250,13 +230,13 @@ async function createIssueOnGithub(options, assigneeSelectCount, assignees) {
     ) {
       issuesAssignees = []
       if (
-        tempAssigneeSelectCount <= assignees.data.length &&
-        tempAssigneeSelectCount <= 6
+        assigneeSelectCount <= assignees.data.length &&
+        assigneeSelectCount <= 6
       ) {
-        tempAssigneeSelectCount++
-        issuesAssignees.push(assignees.data[tempAssigneeSelectCount].login)
+        assigneeSelectCount++
+        issuesAssignees.push(assignees.data[assigneeSelectCount].login)
       }
-      return createIssueOnGithub(options, tempAssigneeSelectCount, assignees)
+      return createIssueOnGithub(options, assigneeSelectCount, assignees)
     } else {
       return Promise.reject(error)
     }
@@ -278,7 +258,6 @@ async function updateIssueOnGithub(
   assignees
 ) {
   // This might not be needed
-  let tempAssigneeSelectCount = assigneeSelectCount
   const issueBodyWithId = options.issueBody.concat(
     `\n Unique rule set ID: ${options.uniqueRuleId}`
   )
@@ -302,16 +281,16 @@ async function updateIssueOnGithub(
     ) {
       issuesAssignees = []
       if (
-        tempAssigneeSelectCount <= assignees.data.length &&
-        tempAssigneeSelectCount <= 6
+        assigneeSelectCount <= assignees.data.length &&
+        assigneeSelectCount <= 6
       ) {
-        tempAssigneeSelectCount++
-        issuesAssignees.push(assignees.data[tempAssigneeSelectCount].login)
+        assigneeSelectCount++
+        issuesAssignees.push(assignees.data[assigneeSelectCount].login)
       }
       return updateIssueOnGithub(
         options,
         issueNumber,
-        tempAssigneeSelectCount,
+        assigneeSelectCount,
         assignees
       )
     } else {
