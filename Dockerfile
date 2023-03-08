@@ -64,4 +64,4 @@ COPY . .
 ENV BUNDLE_GEMFILE=/app/Gemfile
 ENV BUNDLE_PATH=/app/vendor/bundle
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]
