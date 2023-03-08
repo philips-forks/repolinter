@@ -370,6 +370,7 @@ async function runRuleset(ruleset, targets, fileSystem, dryRun) {
   // generate a flat array of axiom string identifiers
   /** @ignore @type {string[]} */
   let targetArray = []
+  const sequentialRuleProcessingArrayList = []
   if (typeof targets !== 'boolean') {
     targetArray = Object.entries(targets)
       // restricted to only passed axioms
@@ -386,27 +387,46 @@ async function runRuleset(ruleset, targets, fileSystem, dryRun) {
   const allRules = await loadRules()
   // load the fixes
   const allFixes = await loadFixes()
-  // run the ruleset
-  const results = ruleset.map(async r => {
+  // run the ruleset async
+  const results = []
+  ruleset.map(async r => {
     // check axioms and enable appropriately
     if (r.level === 'off') {
-      return FormatResult.CreateIgnored(r, 'ignored because level is "off"')
+      results.push(
+        Promise.resolve(
+          FormatResult.CreateIgnored(r, 'ignored because level is "off"')
+        )
+      )
+    }
+    // check if rule should be processes sequentially
+    if (r.disableAsync) {
+      console.log(`Found rule that disabled async! ${r.name}`)
+      sequentialRuleProcessingArrayList.push(r)
+      return
     }
     // filter to only targets with no matches
     if (typeof targets !== 'boolean' && r.where && r.where.length) {
       const ignoreReasons = shouldRuleRun(targetArray, r.where)
       if (ignoreReasons.length > 0) {
-        return FormatResult.CreateIgnored(
-          r,
-          `ignored due to unsatisfied condition(s): "${ignoreReasons.join(
-            '", "'
-          )}"`
+        results.push(
+          Promise.resolve(
+            FormatResult.CreateIgnored(
+              r,
+              `ignored due to unsatisfied condition(s): "${ignoreReasons.join(
+                '", "'
+              )}"`
+            )
+          )
         )
       }
     }
     // check if the rule file exists
     if (!Object.prototype.hasOwnProperty.call(allRules, r.ruleType)) {
-      return FormatResult.CreateError(r, `${r.ruleType} is not a valid rule`)
+      results.push(
+        Promise.resolve(
+          FormatResult.CreateError(r, `${r.ruleType} is not a valid rule`)
+        )
+      )
     }
     let result
     try {
@@ -415,9 +435,13 @@ async function runRuleset(ruleset, targets, fileSystem, dryRun) {
       // run the rule!
       result = await ruleFunc(fileSystem, r.ruleConfig)
     } catch (e) {
-      return FormatResult.CreateError(
-        r,
-        `${r.ruleType} threw an error: ${e.message}`
+      results.push(
+        Promise.resolve(
+          FormatResult.CreateError(
+            r,
+            `${r.ruleType} threw an error: ${e.message}`
+          )
+        )
       )
     }
     // generate fix targets
@@ -426,26 +450,128 @@ async function runRuleset(ruleset, targets, fileSystem, dryRun) {
       : []
     // if there's no fix or the rule passed, we're done
     if (!r.fixType || result.passed) {
-      return FormatResult.CreateLintOnly(r, result)
+      results.push(Promise.resolve(FormatResult.CreateLintOnly(r, result)))
     }
     // else run the fix
     // check if the rule file exists
     if (!Object.prototype.hasOwnProperty.call(allFixes, r.fixType)) {
-      return FormatResult.CreateError(r, `${r.fixType} is not a valid fix`)
+      results.push(
+        Promise.resolve(
+          FormatResult.CreateError(r, `${r.fixType} is not a valid fix`)
+        )
+      )
     }
     let fixresult
     try {
       const fixFunc = allFixes[r.fixType]()
       fixresult = await fixFunc(fileSystem, r.fixConfig, fixTargets, dryRun)
     } catch (e) {
-      return FormatResult.CreateError(
-        r,
-        `${r.fixType} threw an error: ${e.message}`
+      results.push(
+        Promise.resolve(
+          FormatResult.CreateError(
+            r,
+            `${r.fixType} threw an error: ${e.message}`
+          )
+        )
       )
     }
     // all done! return the final format object
     return FormatResult.CreateLintAndFix(r, result, fixresult)
   })
+
+  for (let i = 0; i < sequentialRuleProcessingArrayList.length; i++) {
+    const r = sequentialRuleProcessingArrayList[i]
+    // check axioms and enable appropriately
+    if (r.level === 'off') {
+      results.push(
+        Promise.resolve(
+          FormatResult.CreateIgnored(r, 'ignored because level is "off"')
+        )
+      )
+      continue
+    }
+    // filter to only targets with no matches
+    if (typeof targets !== 'boolean' && r.where && r.where.length) {
+      const ignoreReasons = shouldRuleRun(targetArray, r.where)
+      if (ignoreReasons.length > 0) {
+        results.push(
+          Promise.resolve(
+            FormatResult.CreateIgnored(
+              r,
+              `ignored due to unsatisfied condition(s): "${ignoreReasons.join(
+                '", "'
+              )}"`
+            )
+          )
+        )
+        continue
+      }
+    }
+    // check if the rule file exists
+    if (!Object.prototype.hasOwnProperty.call(allRules, r.ruleType)) {
+      results.push(
+        Promise.resolve(
+          FormatResult.CreateError(r, `${r.ruleType} is not a valid rule`)
+        )
+      )
+      continue
+    }
+    let result
+    try {
+      // load the rule
+      const ruleFunc = allRules[r.ruleType]()
+      // run the rule!
+      result = await ruleFunc(fileSystem, r.ruleConfig)
+    } catch (e) {
+      results.push(
+        Promise.resolve(
+          FormatResult.CreateError(
+            r,
+            `${r.ruleType} threw an error: ${e.message}`
+          )
+        )
+      )
+      continue
+    }
+    // generate fix targets
+    const fixTargets = !result.passed
+      ? result.targets.filter(t => !t.passed && t.path).map(t => t.path)
+      : []
+    // if there's no fix or the rule passed, we're done
+    if (!r.fixType || result.passed) {
+      results.push(Promise.resolve(FormatResult.CreateLintOnly(r, result)))
+      continue
+    }
+    // else run the fix
+    // check if the rule file exists
+    if (!Object.prototype.hasOwnProperty.call(allFixes, r.fixType)) {
+      results.push(
+        Promise.resolve(
+          FormatResult.CreateError(r, `${r.fixType} is not a valid fix`)
+        )
+      )
+      continue
+    }
+    let fixresult
+    try {
+      const fixFunc = allFixes[r.fixType]()
+      fixresult = await fixFunc(fileSystem, r.fixConfig, fixTargets, dryRun)
+    } catch (e) {
+      results.push(
+        Promise.resolve(
+          FormatResult.CreateError(
+            r,
+            `${r.fixType} threw an error: ${e.message}`
+          )
+        )
+      )
+      continue
+    }
+    // all done! return the final format object
+    results.push(
+      Promise.resolve(FormatResult.CreateLintAndFix(r, result, fixresult))
+    )
+  }
 
   return Promise.all(results)
 }
