@@ -228,7 +228,22 @@ describe('rule', () => {
         : path.resolve('bin/repolinter.js')
     this.timeout(30000)
     describe('when checking only default branch', () => {
-      it('returns should not find content from different branches', async () => {})
+      it('returned content should not find content from different branches', async () => {
+        const actual = await execAsync(
+          `${repolinterPath} lint -g https://github.com/Brend-Smits/repolinter-tests.git --rulesetFile rulesets/file-content-default-branch.json`
+        )
+
+        expect(actual.code).to.equal(0)
+        expect(actual.out.trim()).to.contain('Lint:')
+      })
+      it('returns error if content is not found', async () => {
+        const actual = await execAsync(
+          `${repolinterPath} lint -g https://github.com/Brend-Smits/repolinter-tests.git --rulesetFile rulesets/file-content-default-branch-should-not-find.json`
+        )
+
+        expect(actual.code).to.equal(1)
+        expect(actual.out.trim()).to.contain('Lint:')
+      })
     })
     describe('when checking various branches', () => {
       it('returns content from both default and target branch', async () => {
@@ -239,7 +254,14 @@ describe('rule', () => {
         expect(actual.code).to.equal(0)
         expect(actual.out.trim()).to.contain('Lint:')
       })
-      it('returns matched content from different branch that is not default', async () => {})
+      it('returns matched content from different branch that is not default', async () => {
+        const actual = await execAsync(
+          `${repolinterPath} lint -g https://github.com/Brend-Smits/repolinter-tests.git --rulesetFile rulesets/any-content-check-only-target-branch.json`
+        )
+
+        expect(actual.code).to.equal(0)
+        expect(actual.out.trim()).to.contain('Lint:')
+      })
     })
   })
 })
