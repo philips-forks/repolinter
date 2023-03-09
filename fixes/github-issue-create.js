@@ -3,15 +3,14 @@
 
 const Result = require('../lib/result')
 const InternalHelpers = require('./helpers/github-issue-create-helpers')
-// eslint-disable-next-line no-unused-vars
 const { Octokit } = require('@octokit/rest')
 let targetOrg = ''
 let targetRepository = ''
-let issuesAssignees = new Array(0)
+let issueAssignees = new Array(0)
 const maxAssigneeRetryCount = 5
 
 /**
- * Create a Github Issue on the targeted repository specifically for this broken rule.
+ * Create a GitHub Issue on the targeted repository specifically for this broken rule.
  *
  * @param {FileSystem} fs A filesystem object configured with filter paths and target directories
  * @param {object} options The rule configuration
@@ -48,27 +47,27 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
       this.Octokit
     )
 
-    let assignees = []
+    let Contributors = []
     // Retrieve committers of a repository if assignTopCommitter option is set or undefined.
     if (options.assignTopCommitter === undefined) {
       options.assignTopCommitter = true
     }
     if (options.assignTopCommitter) {
-      assignees = await getTopCommittersOfRepository(
+      Contributors = await getTopCommittersOfRepository(
         targetOrg,
         targetRepository
       )
-      if (assignees !== undefined && assignees.data.length > 0) {
-        issuesAssignees.push(assignees.data[0].login)
+      if (Contributors !== undefined && Contributors.data.length > 0) {
+        issueAssignees.push(Contributors.data[0].login)
       }
     }
 
     // If there are no issues, create one.
-    // If there are issues, we loop through them and handle each each on it's own
+    // If there are issues, we loop through them and handle each on its own
     if (issues === null || issues === undefined) {
       try {
         // Issue should include the broken rule, a message in the body and a label.
-        const createdIssue = await createIssueOnGithub(options, 0, assignees)
+        const createdIssue = await createIssueOnGithub(options, Contributors)
         // We are done here, we created a new issue.
         return new Result(
           `No Open/Closed issues were found for this rule - Created new Github Issue with issue number - ${createdIssue.data.number}`,
@@ -106,7 +105,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
           ) {
             try {
               // Issue should include the broken rule, a message in the body and a label.
-              await updateIssueOnGithub(options, issue.number, 0, assignees)
+              await updateIssueOnGithub(options, issue.number, 0, Contributors)
             } catch (e) {
               return new Result(
                 `Something went wrong when trying to update issue id: ${issue.number}: ${e.message}`,
@@ -141,7 +140,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
         } else {
           try {
             // Issue should include the broken rule, a message in the body and a label.
-            await updateIssueOnGithub(options, issue.number, 0, assignees)
+            await updateIssueOnGithub(options, issue.number, 0, Contributors)
           } catch (e) {
             return new Result(
               `Something went wrong when trying to update issue id: ${issue.number}: ${e.message}`,
@@ -166,7 +165,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
     // Issue should include the broken rule, a message in the body and a label.
     try {
       // Issue should include the broken rule, a message in the body and a label.
-      const newIssue = await createIssueOnGithub(options, 0, assignees)
+      const newIssue = await createIssueOnGithub(options, Contributors)
       // We are done here, we created a new issue.
       return new Result(
         `Github Issue ${newIssue.data.number} Created!`,
@@ -210,11 +209,15 @@ async function getTopCommittersOfRepository(targetOrg, targetRepository) {
  * Create an issue on GitHub with labels and all on the target repository.
  *
  * @param {object} options The rule configuration.
- * @param {number} assigneeSelectCount counter for which assignee was selected
- * @param {array<object>} assignees array of contributors
+ * @param {array<object>} contributors array of contributors
+ * @param {number} contributorSelectIndex counter for which assignee was selected
  * @returns {object} Returns issue after adding it via the GitHub API.
  */
-async function createIssueOnGithub(options, assigneeSelectCount, assignees) {
+async function createIssueOnGithub(
+  options,
+  contributors,
+  contributorSelectIndex = 0
+) {
   // This might not be needed
   return await this.Octokit.request('POST /repos/{owner}/{repo}/issues', {
     owner: targetOrg,
@@ -222,25 +225,25 @@ async function createIssueOnGithub(options, assigneeSelectCount, assignees) {
     title: options.issueTitle,
     body: InternalHelpers.generateIssueBody(options),
     labels: options.issueLabels,
-    assignees: issuesAssignees
+    assignees: issueAssignees
   }).catch(error => {
     if (
       error.status === 422 &&
       error.message.indexOf('Validation Failed: ') !== -1 &&
       error.message.indexOf('"field":"assignees","code":"invalid"}')
     ) {
-      issuesAssignees = []
+      issueAssignees = []
       if (
-        assigneeSelectCount < assignees.data.length &&
-        assigneeSelectCount <= maxAssigneeRetryCount
+        contributorSelectIndex < contributors.data.length &&
+        contributorSelectIndex <= maxAssigneeRetryCount
       ) {
-        assigneeSelectCount++
-        issuesAssignees.push(assignees.data[assigneeSelectCount].login)
+        contributorSelectIndex++
+        issueAssignees.push(contributors.data[contributorSelectIndex].login)
       }
       console.log(
-        `Create issue for ${assignees.data[assigneeSelectCount].login}`
+        `Create issue for ${contributors.data[contributorSelectIndex].login}`
       )
-      return createIssueOnGithub(options, assigneeSelectCount, assignees)
+      return createIssueOnGithub(options, contributors, contributorSelectIndex)
     } else {
       return Promise.reject(error)
     }
@@ -274,7 +277,7 @@ async function updateIssueOnGithub(
       title: options.issueTitle,
       body: issueBodyWithId,
       labels: options.issueLabels,
-      assignees: issuesAssignees,
+      assignees: issueAssignees,
       state: 'open'
     }
   ).catch(error => {
@@ -283,13 +286,13 @@ async function updateIssueOnGithub(
       error.message.indexOf('Validation Failed: ') !== -1 &&
       error.message.indexOf('"field":"assignees","code":"invalid"}')
     ) {
-      issuesAssignees = []
+      issueAssignees = []
       if (
         assigneeSelectCount <= assignees.data.length &&
         assigneeSelectCount <= maxAssigneeRetryCount
       ) {
         assigneeSelectCount++
-        issuesAssignees.push(assignees.data[assigneeSelectCount].login)
+        issueAssignees.push(assignees.data[assigneeSelectCount].login)
       }
       return updateIssueOnGithub(
         options,
