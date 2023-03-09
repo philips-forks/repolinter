@@ -105,7 +105,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
           ) {
             try {
               // Issue should include the broken rule, a message in the body and a label.
-              await updateIssueOnGithub(options, issue.number, 0, contributors)
+              await updateIssueOnGithub(options, issue.number, contributors)
             } catch (e) {
               return new Result(
                 `Something went wrong when trying to update issue id: ${issue.number}: ${e.message}`,
@@ -140,7 +140,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
         } else {
           try {
             // Issue should include the broken rule, a message in the body and a label.
-            await updateIssueOnGithub(options, issue.number, 0, contributors)
+            await updateIssueOnGithub(options, issue.number, contributors)
           } catch (e) {
             return new Result(
               `Something went wrong when trying to update issue id: ${issue.number}: ${e.message}`,
@@ -254,15 +254,15 @@ async function createIssueOnGithub(
  *
  * @param {object} options The rule configuration.
  * @param {string} issueNumber The number of the issue we should update.
- * @param {number} assigneeSelectCount counter for which assignee was selected
  * @param {array<object>} assignees array of contributors
+ * @param {number} assigneeSelectIndex index for which assignee was selected
  * @returns {object} Returns issue after updating it via the Github API.
  */
 async function updateIssueOnGithub(
   options,
   issueNumber,
-  assigneeSelectCount,
-  assignees
+  assignees,
+  assigneeSelectIndex = 0
 ) {
   // This might not be needed
   const issueBodyWithId = options.issueBody.concat(
@@ -288,17 +288,17 @@ async function updateIssueOnGithub(
     ) {
       issueAssignees = []
       if (
-        assigneeSelectCount <= assignees.data.length &&
-        assigneeSelectCount <= maxAssigneeRetryCount
+        assigneeSelectIndex <= assignees.data.length &&
+        assigneeSelectIndex <= maxAssigneeRetryCount
       ) {
-        assigneeSelectCount++
-        issueAssignees.push(assignees.data[assigneeSelectCount].login)
+        assigneeSelectIndex++
+        issueAssignees.push(assignees.data[assigneeSelectIndex].login)
       }
       return updateIssueOnGithub(
         options,
         issueNumber,
-        assigneeSelectCount,
-        assignees
+        assignees,
+        assigneeSelectIndex
       )
     } else {
       return Promise.reject(error)
