@@ -370,7 +370,7 @@ async function runRuleset(ruleset, targets, fileSystem, dryRun) {
   // generate a flat array of axiom string identifiers
   /** @ignore @type {string[]} */
   let targetArray = []
-  const sequentialRuleProcessingArrayList = []
+  const sequentialRuleProcessingArrayList = ruleset.filter(r => r.disableAsync)
   if (typeof targets !== 'boolean') {
     targetArray = Object.entries(targets)
       // restricted to only passed axioms
@@ -388,6 +388,7 @@ async function runRuleset(ruleset, targets, fileSystem, dryRun) {
   // load the fixes
   const allFixes = await loadFixes()
   // run the ruleset async
+  ruleset = ruleset.filter(r => !r.disableAsync)
   const results = ruleset.map(async r => {
     // check axioms and enable appropriately
     if (r.level === 'off') {
