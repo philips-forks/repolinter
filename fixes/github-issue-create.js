@@ -47,18 +47,18 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
       this.Octokit
     )
 
-    let Contributors = []
+    let contributors = []
     // Retrieve committers of a repository if assignTopCommitter option is set or undefined.
     if (options.assignTopCommitter === undefined) {
       options.assignTopCommitter = true
     }
     if (options.assignTopCommitter) {
-      Contributors = await getTopCommittersOfRepository(
+      contributors = await getTopCommittersOfRepository(
         targetOrg,
         targetRepository
       )
-      if (Contributors !== undefined && Contributors.data.length > 0) {
-        issueAssignees.push(Contributors.data[0].login)
+      if (contributors !== undefined && contributors.data.length > 0) {
+        issueAssignees.push(contributors.data[0].login)
       }
     }
 
@@ -67,7 +67,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
     if (issues === null || issues === undefined) {
       try {
         // Issue should include the broken rule, a message in the body and a label.
-        const createdIssue = await createIssueOnGithub(options, Contributors)
+        const createdIssue = await createIssueOnGithub(options, contributors)
         // We are done here, we created a new issue.
         return new Result(
           `No Open/Closed issues were found for this rule - Created new Github Issue with issue number - ${createdIssue.data.number}`,
@@ -105,7 +105,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
           ) {
             try {
               // Issue should include the broken rule, a message in the body and a label.
-              await updateIssueOnGithub(options, issue.number, 0, Contributors)
+              await updateIssueOnGithub(options, issue.number, 0, contributors)
             } catch (e) {
               return new Result(
                 `Something went wrong when trying to update issue id: ${issue.number}: ${e.message}`,
@@ -140,7 +140,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
         } else {
           try {
             // Issue should include the broken rule, a message in the body and a label.
-            await updateIssueOnGithub(options, issue.number, 0, Contributors)
+            await updateIssueOnGithub(options, issue.number, 0, contributors)
           } catch (e) {
             return new Result(
               `Something went wrong when trying to update issue id: ${issue.number}: ${e.message}`,
@@ -165,7 +165,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
     // Issue should include the broken rule, a message in the body and a label.
     try {
       // Issue should include the broken rule, a message in the body and a label.
-      const newIssue = await createIssueOnGithub(options, Contributors)
+      const newIssue = await createIssueOnGithub(options, contributors)
       // We are done here, we created a new issue.
       return new Result(
         `Github Issue ${newIssue.data.number} Created!`,
