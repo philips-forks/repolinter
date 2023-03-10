@@ -51,7 +51,7 @@ declare class RuleInfo {
   fixConfig?: any
   policyInfo?: string
   policyUrl?: string
-  disableAsync?: boolean
+  sequentialOnly?: boolean
 }
 
 declare class FormatResult {

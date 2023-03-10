@@ -42,7 +42,7 @@
           "additionalProperties": false,
           "properties": {
             "level": { "enum": ["off", "warning", "error"] },
-            "disableAsync": {
+            "sequentialOnly": {
               "type": "boolean",
               "default": false
             },
