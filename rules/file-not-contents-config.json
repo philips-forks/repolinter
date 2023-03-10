@@ -14,7 +14,7 @@
     "branches": {
       "type": "array",
       "items": { "type": "string" },
-      "default": ["default"]
+      "default": []
     },
     "content": { "type": "string" },
     "flags": { "type": "string" },

@@ -4,10 +4,33 @@
 const chai = require('chai')
 const expect = chai.expect
 const FileSystem = require('../../lib/file_system')
+const cp = require('child_process')
+const path = require('path')
+
+/**
+ * Execute a command in a childprocess asynchronously. Not secure, but good for testing.
+ *
+ * @param {string} command The command to execute
+ * @param {import('child_process').ExecOptions} [opts] Options to execute against.
+ * @returns {Promise<{out: string, err: string, code: number}>} The command output
+ */
+async function execAsync(command, opts = {}) {
+  return new Promise((resolve, reject) => {
+    cp.exec(command, opts, (err, outstd, errstd) =>
+      err !== null && err.code === undefined
+        ? reject(err)
+        : resolve({
+            out: outstd,
+            err: errstd,
+            code: err !== null ? err.code : 0
+          })
+    )
+  })
+}
 
 describe('rule', () => {
+  const fileContents = require('../../rules/file-contents')
   describe('files_contents', () => {
-    const fileContents = require('../../rules/file-contents')
     const mockGit = {
       branchLocal() {
         return { current: 'master' }
@@ -196,6 +219,49 @@ describe('rule', () => {
       const actual = await fileContents(fs, rule, undefined, undefined, mockGit)
 
       expect(actual.passed).to.equal(true)
+    })
+  })
+  describe('rule file_contents in branch', function () {
+    const repolinterPath =
+      process.platform === 'win32'
+        ? path.resolve('bin/repolinter.bat')
+        : path.resolve('bin/repolinter.js')
+    this.timeout(30000)
+    describe('when checking only default branch', () => {
+      it('returned content should not find content from different branches', async () => {
+        const actual = await execAsync(
+          `${repolinterPath} lint -g https://github.com/Brend-Smits/repolinter-tests.git --rulesetFile rulesets/file-content-default-branch.json`
+        )
+
+        expect(actual.code).to.equal(0)
+        expect(actual.out.trim()).to.contain('Lint:')
+      })
+      it('returns error if content is not found', async () => {
+        const actual = await execAsync(
+          `${repolinterPath} lint -g https://github.com/Brend-Smits/repolinter-tests.git --rulesetFile rulesets/file-content-default-branch-should-not-find.json`
+        )
+
+        expect(actual.code).to.equal(1)
+        expect(actual.out.trim()).to.contain('Lint:')
+      })
+    })
+    describe('when checking various branches', () => {
+      it('returns content from both default and target branch', async () => {
+        const actual = await execAsync(
+          `${repolinterPath} lint -g https://github.com/Brend-Smits/repolinter-tests.git --rulesetFile rulesets/any-content-check-branch.json`
+        )
+
+        expect(actual.code).to.equal(0)
+        expect(actual.out.trim()).to.contain('Lint:')
+      })
+      it('returns matched content from different branch that is not default', async () => {
+        const actual = await execAsync(
+          `${repolinterPath} lint -g https://github.com/Brend-Smits/repolinter-tests.git --rulesetFile rulesets/any-content-check-only-target-branch.json`
+        )
+
+        expect(actual.code).to.equal(0)
+        expect(actual.out.trim()).to.contain('Lint:')
+      })
     })
   })
 })
