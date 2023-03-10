@@ -1,8 +1,13 @@
 const { expect } = require('chai')
 const nock = require('nock')
 const { Octokit } = require('@octokit/rest')
-
-function mockStandardGithubApiCalls(repoIssues, githubIssueTemplate) {
+require('../../fixes/github-issue-create')
+const Result = require('../../lib/result')
+function mockStandardGithubApiCalls(
+  repoIssues,
+  githubIssueTemplate,
+  contributors
+) {
   nock('https://api.github.com')
     .get(
       `/repos/test/tester-repo/issues?labels=continuous-compliance%2Cautomated&state=all&sort=created&direction=desc`
@@ -20,7 +25,7 @@ function mockStandardGithubApiCalls(repoIssues, githubIssueTemplate) {
     .reply(200)
   nock('https://api.github.com')
     .get(`/repos/test/tester-repo/contributors`)
-    .reply(200)
+    .reply(200, contributors)
   nock('https://api.github.com')
     .post(`/repos/test/tester-repo/issues`)
     .reply(200, githubIssueTemplate)
@@ -35,6 +40,7 @@ describe('fixes', () => {
       issueCreator: 'Philips - Continuous Compliance',
       issueLabels: ['continuous-compliance', 'automated'],
       bypassLabel: 'CC: Bypass',
+      assignTopCommitter: false,
       issueTitle: 'Continuous Compliance - Valid test 👍',
       issueBody:
         'Hi there 👋, \n' +
@@ -364,6 +370,215 @@ describe('fixes', () => {
           expect(result.message).to.equal(
             'No Open/Closed issues were found for this rule - Created new Github Issue with issue number - 17'
           )
+        })
+        describe('without valid top contributor', () => {
+          it('it should not assign a person to the issue', async () => {
+            // Prepare
+            const contributors = [
+              {
+                login: 'test-user',
+                id: 1590451111337,
+                node_id: 'MDQ6VXNlcjE1OTA0NTQz',
+                avatar_url:
+                  'https://avatars.githubusercontent.com/u/1590451111337?v=4',
+                gravatar_id: '',
+                url: 'https://api.github.com/users/test-user',
+                html_url: 'https://github.com/test-user',
+                followers_url:
+                  'https://api.github.com/users/test-user/followers',
+                following_url:
+                  'https://api.github.com/users/test-user/following{/other_user}',
+                gists_url:
+                  'https://api.github.com/users/test-user/gists{/gist_id}',
+                starred_url:
+                  'https://api.github.com/users/test-user/starred{/owner}{/repo}',
+                subscriptions_url:
+                  'https://api.github.com/users/test-user/subscriptions',
+                organizations_url:
+                  'https://api.github.com/users/test-user/orgs',
+                repos_url: 'https://api.github.com/users/test-user/repos',
+                events_url:
+                  'https://api.github.com/users/test-user/events{/privacy}',
+                received_events_url:
+                  'https://api.github.com/users/test-user/received_events',
+                type: 'User',
+                site_admin: false,
+                contributions: 34
+              },
+              {
+                login: 'dependabot[bot]',
+                id: 49699333,
+                node_id: 'MDM6Qm90NDk2OTkzMzM=',
+                avatar_url:
+                  'https://avatars.githubusercontent.com/in/29110?v=4',
+                gravatar_id: '',
+                url: 'https://api.github.com/users/dependabot%5Bbot%5D',
+                html_url: 'https://github.com/apps/dependabot',
+                followers_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/followers',
+                following_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/following{/other_user}',
+                gists_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/gists{/gist_id}',
+                starred_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/starred{/owner}{/repo}',
+                subscriptions_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/subscriptions',
+                organizations_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/orgs',
+                repos_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/repos',
+                events_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/events{/privacy}',
+                received_events_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/received_events',
+                type: 'Bot',
+                site_admin: false,
+                contributions: 4
+              }
+            ]
+            nock('https://api.github.com')
+              .get(
+                `/repos/test/tester-repo/issues?labels=continuous-compliance%2Cautomated&state=all&sort=created&direction=desc`
+              )
+              .reply(200, [])
+            nock('https://api.github.com')
+              .get(`/repos/test/tester-repo/labels/continuous-compliance`)
+              .reply(200)
+            nock('https://api.github.com')
+              .get(`/repos/test/tester-repo/labels/automated`)
+              .reply(200)
+            nock('https://api.github.com')
+              .get(`/repos/test/tester-repo/labels/CC%3A%20Bypass`)
+              .reply(200)
+            nock('https://api.github.com')
+              .get(`/repos/test/tester-repo/contributors`)
+              .reply(200, contributors)
+            nock('https://api.github.com')
+              .post(`/repos/test/tester-repo/issues`)
+              .reply(422, {
+                status: 422,
+                message:
+                  'Validation Failed: {"value":"test-user","resource":"Issue","field":"assignees","code":"invalid"}'
+              })
+            nock('https://api.github.com')
+              .post(`/repos/test/tester-repo/issues`)
+              .reply(200, githubIssue)
+
+            const validOptionsWithContributionOption = validOptions
+            validOptionsWithContributionOption.assignTopCommitter = true
+
+            // Act
+            const result = await GithubIssueCreate(
+              null,
+              validOptionsWithContributionOption,
+              [],
+              true
+            )
+
+            // Assert
+            expect(result.message).to.equal(
+              'No Open/Closed issues were found for this rule - Created new Github Issue with issue number - 17'
+            )
+          })
+        })
+        describe('when erroring', () => {
+          it('it should fail gracefully and fail the fix', async () => {
+            nock.cleanAll()
+            const contributors = [
+              {
+                login: 'test-user',
+                id: 1590451111337,
+                node_id: 'MDQ6VXNlcjE1OTA0NTQz',
+                avatar_url:
+                  'https://avatars.githubusercontent.com/u/1590451111337?v=4',
+                gravatar_id: '',
+                url: 'https://api.github.com/users/test-user',
+                html_url: 'https://github.com/test-user',
+                followers_url:
+                  'https://api.github.com/users/test-user/followers',
+                following_url:
+                  'https://api.github.com/users/test-user/following{/other_user}',
+                gists_url:
+                  'https://api.github.com/users/test-user/gists{/gist_id}',
+                starred_url:
+                  'https://api.github.com/users/test-user/starred{/owner}{/repo}',
+                subscriptions_url:
+                  'https://api.github.com/users/test-user/subscriptions',
+                organizations_url:
+                  'https://api.github.com/users/test-user/orgs',
+                repos_url: 'https://api.github.com/users/test-user/repos',
+                events_url:
+                  'https://api.github.com/users/test-user/events{/privacy}',
+                received_events_url:
+                  'https://api.github.com/users/test-user/received_events',
+                type: 'User',
+                site_admin: false,
+                contributions: 34
+              },
+              {
+                login: 'dependabot[bot]',
+                id: 49699333,
+                node_id: 'MDM6Qm90NDk2OTkzMzM=',
+                avatar_url:
+                  'https://avatars.githubusercontent.com/in/29110?v=4',
+                gravatar_id: '',
+                url: 'https://api.github.com/users/dependabot%5Bbot%5D',
+                html_url: 'https://github.com/apps/dependabot',
+                followers_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/followers',
+                following_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/following{/other_user}',
+                gists_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/gists{/gist_id}',
+                starred_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/starred{/owner}{/repo}',
+                subscriptions_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/subscriptions',
+                organizations_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/orgs',
+                repos_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/repos',
+                events_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/events{/privacy}',
+                received_events_url:
+                  'https://api.github.com/users/dependabot%5Bbot%5D/received_events',
+                type: 'Bot',
+                site_admin: false,
+                contributions: 4
+              }
+            ]
+            nock('https://api.github.com')
+              .get(
+                `/repos/test/tester-repo/issues?labels=continuous-compliance%2Cautomated&state=all&sort=created&direction=desc`
+              )
+              .reply(200, [])
+            nock('https://api.github.com')
+              .get(`/repos/test/tester-repo/labels/continuous-compliance`)
+              .reply(200)
+            nock('https://api.github.com')
+              .get(`/repos/test/tester-repo/labels/automated`)
+              .reply(200)
+            nock('https://api.github.com')
+              .get(`/repos/test/tester-repo/labels/CC%3A%20Bypass`)
+              .reply(200)
+            nock('https://api.github.com')
+              .get(`/repos/test/tester-repo/contributors`)
+              .reply(200, contributors)
+            nock('https://api.github.com')
+              .post(`/repos/test/tester-repo/issues`)
+              .reply(500, { message: 'service unavailable' })
+
+            // Act
+            const result = await GithubIssueCreate(null, validOptions, [], true)
+
+            // Assert
+            expect(result).to.be.an.instanceof(Result)
+            expect(result.passed).to.equal(false)
+            expect(result.message.trim()).to.equal(
+              'Something went wrong when trying to create the issue: service unavailable'
+            )
+          })
         })
       })
     })

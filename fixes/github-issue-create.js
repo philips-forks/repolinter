@@ -3,14 +3,14 @@
 
 const Result = require('../lib/result')
 const InternalHelpers = require('./helpers/github-issue-create-helpers')
-// eslint-disable-next-line no-unused-vars
 const { Octokit } = require('@octokit/rest')
 let targetOrg = ''
 let targetRepository = ''
-const issuesAssignees = new Array(0)
+let issueAssignees = new Array(0)
+const maxAssigneeRetryCount = 5
 
 /**
- * Create a Github Issue on the targeted repository specifically for this broken rule.
+ * Create a GitHub Issue on the targeted repository specifically for this broken rule.
  *
  * @param {FileSystem} fs A filesystem object configured with filter paths and target directories
  * @param {object} options The rule configuration
@@ -47,31 +47,37 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
       this.Octokit
     )
 
-    // Retrieve committers of a repository if option is enabled
+    let contributors = []
+    // Retrieve committers of a repository if assignTopCommitter option is set or undefined.
     if (options.assignTopCommitter === undefined) {
       options.assignTopCommitter = true
     }
     if (options.assignTopCommitter) {
-      const assignees = await getTopCommittersOfRepository(
-        targetOrg,
-        targetRepository
-      )
-      if (assignees !== undefined && assignees.data.length > 0) {
-        issuesAssignees.push(assignees.data[0].login)
+      contributors = await getTopContributors(targetOrg, targetRepository)
+      if (contributors !== undefined && contributors.data.length > 0) {
+        issueAssignees.push(contributors.data[0].login)
       }
     }
 
     // If there are no issues, create one.
-    // If there are issues, we loop through them and handle each each on it's own
+    // If there are issues, we loop through them and handle each on its own
     if (issues === null || issues === undefined) {
-      // Issue should include the broken rule, a message in the body and a label.
-      const createdIssue = await createIssueOnGithub(options)
-      // We are done here, we created a new issue.
-      return new Result(
-        `No Open/Closed issues were found for this rule - Created new Github Issue with issue number - ${createdIssue.data.number}`,
-        [],
-        true
-      )
+      try {
+        // Issue should include the broken rule, a message in the body and a label.
+        const createdIssue = await createIssueOnGithub(options, contributors)
+        // We are done here, we created a new issue.
+        return new Result(
+          `No Open/Closed issues were found for this rule - Created new Github Issue with issue number - ${createdIssue.data.number}`,
+          [],
+          true
+        )
+      } catch (e) {
+        return new Result(
+          `Something went wrong when trying to create the issue: ${e.message}`,
+          [],
+          false
+        )
+      }
     }
 
     const openIssues = issues.filter(issue => issue.state === 'open')
@@ -94,7 +100,16 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
             issue.title !== options.issueTitle ||
             (issue.assignees.length === 0 && options.assignTopCommitter)
           ) {
-            await updateIssueOnGithub(options, issue.number)
+            try {
+              // Issue should include the broken rule, a message in the body and a label.
+              await updateIssueOnGithub(options, issue.number, contributors)
+            } catch (e) {
+              return new Result(
+                `Something went wrong when trying to update issue id: ${issue.number}: ${e.message}`,
+                [],
+                false
+              )
+            }
           }
           return new Result(
             `No Github Issue Created - Issue already exists with correct unique identifier`,
@@ -120,7 +135,16 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
             true
           )
         } else {
-          await updateIssueOnGithub(options, issue.number)
+          try {
+            // Issue should include the broken rule, a message in the body and a label.
+            await updateIssueOnGithub(options, issue.number, contributors)
+          } catch (e) {
+            return new Result(
+              `Something went wrong when trying to update issue id: ${issue.number}: ${e.message}`,
+              [],
+              false
+            )
+          }
           await commentOnGithubIssue(options, issue.number)
           return new Result(
             `Github Issue ${issue.number} re-opened as there seems to be regression!`,
@@ -136,12 +160,22 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
     }
     // There are open/closed issues from Continuous Compliance, but non of them are for this ruleset
     // Issue should include the broken rule, a message in the body and a label.
-    const newIssue = await createIssueOnGithub(options)
-    return new Result(
-      `Github Issue ${newIssue.data.number} Created!`,
-      targets,
-      true
-    )
+    try {
+      // Issue should include the broken rule, a message in the body and a label.
+      const newIssue = await createIssueOnGithub(options, contributors)
+      // We are done here, we created a new issue.
+      return new Result(
+        `Github Issue ${newIssue.data.number} Created!`,
+        targets,
+        true
+      )
+    } catch (e) {
+      return new Result(
+        `Something went wrong when trying to create the issue: ${e.message}`,
+        [],
+        false
+      )
+    }
   } catch (e) {
     console.error(e)
   }
@@ -154,7 +188,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
  * @param {object} targetRepository Target Repository
  * @returns {object} Returns array of contributors.
  */
-async function getTopCommittersOfRepository(targetOrg, targetRepository) {
+async function getTopContributors(targetOrg, targetRepository) {
   try {
     return await this.Octokit.request(
       'GET /repos/{owner}/{repo}/contributors',
@@ -169,53 +203,104 @@ async function getTopCommittersOfRepository(targetOrg, targetRepository) {
 }
 
 /**
- * Create an issue on Github with labels and all on the target repository.
+ * Create an issue on GitHub with labels and all on the target repository.
  *
  * @param {object} options The rule configuration.
- * @returns {object} Returns issue after adding it via the Github API.
+ * @param {array<object>} contributors array of contributors
+ * @param {number} contributorSelectIndex counter for which assignee was selected
+ * @returns {object} Returns issue after adding it via the GitHub API.
  */
-async function createIssueOnGithub(options) {
-  try {
-    return await this.Octokit.request('POST /repos/{owner}/{repo}/issues', {
-      owner: targetOrg,
-      repo: targetRepository,
-      title: options.issueTitle,
-      body: InternalHelpers.generateIssueBody(options),
-      labels: options.issueLabels,
-      assignees: issuesAssignees
-    })
-  } catch (e) {
-    console.error(e)
-  }
+async function createIssueOnGithub(
+  options,
+  contributors,
+  contributorSelectIndex = 0
+) {
+  // This might not be needed
+  return await this.Octokit.request('POST /repos/{owner}/{repo}/issues', {
+    owner: targetOrg,
+    repo: targetRepository,
+    title: options.issueTitle,
+    body: InternalHelpers.generateIssueBody(options),
+    labels: options.issueLabels,
+    assignees: issueAssignees
+  }).catch(error => {
+    if (
+      error.status === 422 &&
+      error.message.indexOf('Validation Failed: ') !== -1 &&
+      error.message.indexOf('"field":"assignees","code":"invalid"}')
+    ) {
+      issueAssignees = []
+      if (
+        contributorSelectIndex < contributors.data.length &&
+        contributorSelectIndex <= maxAssigneeRetryCount
+      ) {
+        contributorSelectIndex++
+        issueAssignees.push(contributors.data[contributorSelectIndex].login)
+      }
+      console.log(
+        `Create issue for ${contributors.data[contributorSelectIndex].login}`
+      )
+      return createIssueOnGithub(options, contributors, contributorSelectIndex)
+    } else {
+      return Promise.reject(error)
+    }
+  })
 }
 /**
  * Update specific issue on Github.
  *
  * @param {object} options The rule configuration.
  * @param {string} issueNumber The number of the issue we should update.
+ * @param {array<object>} assignees array of contributors
+ * @param {number} assigneeSelectIndex index for which assignee was selected
  * @returns {object} Returns issue after updating it via the Github API.
  */
-async function updateIssueOnGithub(options, issueNumber) {
-  try {
-    const issueBodyWithId = options.issueBody.concat(
-      `\n Unique rule set ID: ${options.uniqueRuleId}`
-    )
-    return await this.Octokit.request(
-      'PATCH /repos/{owner}/{repo}/issues/{issue_number}',
-      {
-        owner: targetOrg,
-        repo: targetRepository,
-        issue_number: issueNumber,
-        title: options.issueTitle,
-        body: issueBodyWithId,
-        labels: options.issueLabels,
-        assignees: issuesAssignees,
-        state: 'open'
+async function updateIssueOnGithub(
+  options,
+  issueNumber,
+  assignees,
+  assigneeSelectIndex = 0
+) {
+  // This might not be needed
+  const issueBodyWithId = options.issueBody.concat(
+    `\n Unique rule set ID: ${options.uniqueRuleId}`
+  )
+  return await this.Octokit.request(
+    'PATCH /repos/{owner}/{repo}/issues/{issue_number}',
+    {
+      owner: targetOrg,
+      repo: targetRepository,
+      issue_number: issueNumber,
+      title: options.issueTitle,
+      body: issueBodyWithId,
+      labels: options.issueLabels,
+      assignees: issueAssignees,
+      state: 'open'
+    }
+  ).catch(error => {
+    if (
+      error.status === 422 &&
+      error.message.indexOf('Validation Failed: ') !== -1 &&
+      error.message.indexOf('"field":"assignees","code":"invalid"}')
+    ) {
+      issueAssignees = []
+      if (
+        assigneeSelectIndex <= assignees.data.length &&
+        assigneeSelectIndex <= maxAssigneeRetryCount
+      ) {
+        assigneeSelectIndex++
+        issueAssignees.push(assignees.data[assigneeSelectIndex].login)
       }
-    )
-  } catch (e) {
-    console.error(e)
-  }
+      return updateIssueOnGithub(
+        options,
+        issueNumber,
+        assignees,
+        assigneeSelectIndex
+      )
+    } else {
+      return Promise.reject(error)
+    }
+  })
 }
 
 /**
