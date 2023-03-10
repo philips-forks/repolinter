@@ -53,10 +53,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
       options.assignTopCommitter = true
     }
     if (options.assignTopCommitter) {
-      contributors = await getTopCommittersOfRepository(
-        targetOrg,
-        targetRepository
-      )
+      contributors = await getTopContributors(targetOrg, targetRepository)
       if (contributors !== undefined && contributors.data.length > 0) {
         issueAssignees.push(contributors.data[0].login)
       }
@@ -191,7 +188,7 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
  * @param {object} targetRepository Target Repository
  * @returns {object} Returns array of contributors.
  */
-async function getTopCommittersOfRepository(targetOrg, targetRepository) {
+async function getTopContributors(targetOrg, targetRepository) {
   try {
     return await this.Octokit.request(
       'GET /repos/{owner}/{repo}/contributors',
