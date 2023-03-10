@@ -6,7 +6,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: ['14', '12', '10']
+        node-version: ['19', '18', '16', '14']
         os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
     runs-on: ${{ matrix.os }}
     name: Node ${{ matrix.node-version }} sample (${{ matrix.os }})
@@ -101,7 +101,9 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
 
       - name: Docker Run
-        run: docker run -t -v ${{ github.workspace }}:/src -w /src todogroup/repolinter:latest .
+        run: |
+          git config --global --add safe.directory /src
+          docker run -t -v ${{ github.workspace }}:/src -w /src todogroup/repolinter:latest .
 
   publish-release:
     name: Publish a Release
