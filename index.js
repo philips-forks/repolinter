@@ -422,7 +422,7 @@ async function runRuleset(ruleset, targets, fileSystem, dryRun) {
     let result
     try {
       // load the rule
-      const ruleFunc = Rules[r.ruleType]()
+      const ruleFunc = Rules[r.ruleType]
       // run the rule!
       result = await ruleFunc(fileSystem, r.ruleConfig)
     } catch (e) {
