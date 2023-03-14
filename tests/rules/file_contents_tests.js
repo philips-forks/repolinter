@@ -235,6 +235,7 @@ describe('rule', () => {
 
         expect(actual.code).to.equal(0)
         expect(actual.out.trim()).to.contain('Lint:')
+        expect(actual.out.trim()).to.contain('Contains MAINCONTENT')
       })
       it('returns error if content is not found', async () => {
         const actual = await execAsync(
@@ -243,6 +244,7 @@ describe('rule', () => {
 
         expect(actual.code).to.equal(1)
         expect(actual.out.trim()).to.contain('Lint:')
+        expect(actual.out.trim()).to.contain("Doesn't contain SECONDARYCONTENT")
       })
     })
     describe('when checking various branches', () => {
@@ -253,6 +255,7 @@ describe('rule', () => {
 
         expect(actual.code).to.equal(0)
         expect(actual.out.trim()).to.contain('Lint:')
+        expect(actual.out.trim()).to.contain('Contains MAINCONTENT')
       })
       it('returns matched content from different branch that is not default', async () => {
         const actual = await execAsync(
@@ -261,6 +264,15 @@ describe('rule', () => {
 
         expect(actual.code).to.equal(0)
         expect(actual.out.trim()).to.contain('Lint:')
+        expect(actual.out.trim()).to.contain('Contains SECONDARYCONTENT')
+      })
+      it('returns matched content from all other branches', async () => {
+        const actual = await execAsync(
+          `${repolinterPath} lint -g https://github.com/Brend-Smits/repolinter-tests.git --rulesetFile rulesets/any-content-check-all-other-branches.json`
+        )
+        expect(actual.code).to.equal(0)
+        expect(actual.out.trim()).to.contain('Lint:')
+        expect(actual.out.trim()).to.contain('Contains SECONDARYCONTENT')
       })
     })
   })
