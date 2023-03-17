@@ -295,6 +295,136 @@
               
                 
                 <li><a
+                  href='#filehash'
+                  class="">
+                  fileHash
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#anyfilecontents'
+                  class="">
+                  anyFileContents
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#creategithubissue'
+                  class="">
+                  createGithubIssue
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#gettopcontributors'
+                  class="">
+                  getTopContributors
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#createissueongithub'
+                  class="">
+                  createIssueOnGithub
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#updateissueongithub'
+                  class="">
+                  updateIssueOnGithub
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#commentongithubissue'
+                  class="">
+                  commentOnGithubIssue
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#prepareworkingenvironment'
+                  class="">
+                  prepareWorkingEnvironment
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#hasbypasslabelbeenapplied'
+                  class="">
+                  hasBypassLabelBeenApplied
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#retrieveruleidentifier'
+                  class="">
+                  retrieveRuleIdentifier
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#ensureaddedgithublabels'
+                  class="">
+                  ensureAddedGithubLabels
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#doeslabelexistonrepo'
+                  class="">
+                  doesLabelExistOnRepo
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#findexistingrepolinterissues'
+                  class="">
+                  findExistingRepolinterIssues
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#symbolformatter'
                   class=" toggle-sibling">
                   SymbolFormatter
@@ -435,7 +565,7 @@
 </ul>
 <p>We are working on getting (some) of these changes merged back into upstream. Time is a limiting factor here..</p>
 <h2>Installation</h2>
-<p>Repolinter requires <a href="https://nodejs.org/en/">Node.JS</a> >= v10 to function properly. Once Node.JS is installed, you can install Repolinter using <code>npm</code>:</p>
+<p>Repolinter requires <a href="https://nodejs.org/en/">Node.JS</a> >= v12 to function properly. Once Node.JS is installed, you can install Repolinter using <code>npm</code>:</p>
 <h2>Linting a Local Repository</h2>
 <p>Once installed, run the following to lint a directory:</p>
 <p>The above command will lint <code>&#x3C;directory></code> with the local <code>repolinter.json</code> ruleset or the <a href="./rulesets/default.json">default ruleset</a> if none is found:</p>
@@ -651,6 +781,7 @@ relative to the original file path as <code>/etc/repolinter/default.yaml</code>.
 <li><a href="#file-contents"><code>file-contents</code></a></li>
 <li><a href="#file-existence"><code>file-existence</code></a></li>
 <li><a href="#file-hash"><code>file-hash</code></a></li>
+<li><a href="#file-hashes-not-exist"><code>file-hashes-not-exist</code></a></li>
 <li><a href="#file-no-broken-links"><code>file-no-broken-links</code></a></li>
 <li><a href="#file-not-contents"><code>file-not-contents</code></a></li>
 <li><a href="#file-not-exists"><code>file-not-exists</code></a></li>
@@ -661,6 +792,7 @@ relative to the original file path as <code>/etc/repolinter/default.yaml</code>.
 <li><a href="#git-list-tree"><code>git-list-tree</code></a></li>
 <li><a href="#git-working-tree"><code>git-working-tree</code></a></li>
 <li><a href="#json-schema-passes"><code>json-schema-passes</code></a></li>
+<li><a href="#large-file"><code>large-file</code></a></li>
 <li><a href="#license-detectable-by-licensee"><code>license-detectable-by-licensee</code></a></li>
 <li><a href="#best-practices-badge-present"><code>best-practices-badge-present</code></a></li>
 <li><a href="#any-file-contents"><code>any-file-contents</code></a></li>
@@ -696,7 +828,7 @@ relative to the original file path as <code>/etc/repolinter/default.yaml</code>.
 <td>No</td>
 <td><code>boolean</code></td>
 <td><code>false</code></td>
-<td>Set to <code>true</code> to perform an case insensitive search.</td>
+<td>Set to <code>true</code> to perform a case insensitive search.</td>
 </tr>
 <tr>
 <td><code>fail-message</code></td>
@@ -789,7 +921,7 @@ relative to the original file path as <code>/etc/repolinter/default.yaml</code>.
 <td>No</td>
 <td><code>boolean</code></td>
 <td><code>false</code></td>
-<td>Set to <code>true</code> to perform an case insensitive search.</td>
+<td>Set to <code>true</code> to perform a case insensitive search.</td>
 </tr>
 <tr>
 <td><code>dirs</code></td>
@@ -832,7 +964,7 @@ relative to the original file path as <code>/etc/repolinter/default.yaml</code>.
 <td><strong>Yes</strong></td>
 <td><code>string</code></td>
 <td></td>
-<td>The hash to check against. Unless a different <code>algorithm</code> is specified, this will be sha256.</td>
+<td>The hash to check against. Unless a different <code>algorithm</code> is specified, this will be sha256 hash.</td>
 </tr>
 <tr>
 <td><code>algorithm</code></td>
@@ -846,7 +978,7 @@ relative to the original file path as <code>/etc/repolinter/default.yaml</code>.
 <td>No</td>
 <td><code>boolean</code></td>
 <td><code>false</code></td>
-<td>Set to <code>true</code> to perform an case insensitive search.</td>
+<td>Set to <code>true</code> to perform a case insensitive search.</td>
 </tr>
 <tr>
 <td><code>succeed-on-non-exist</code></td>
@@ -854,6 +986,49 @@ relative to the original file path as <code>/etc/repolinter/default.yaml</code>.
 <td><code>boolean</code></td>
 <td><code>false</code></td>
 <td>Set to <code>true</code> to enable passing if no files are found from <code>globsAll</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3><code>file-hashes-not-exist</code></h3>
+<p>Check files' hashes not included in a list of certain cryptographic hashes.</p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Required</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>globsAll</code></td>
+<td><strong>Yes</strong></td>
+<td><code>string[]</code></td>
+<td></td>
+<td>A list of globs to search for. This rule passes if all the files does not match any of the hashes, or no files are found.</td>
+</tr>
+<tr>
+<td><code>hashes</code></td>
+<td><strong>Yes</strong></td>
+<td><code>string[]</code></td>
+<td></td>
+<td>The hashes to check against. Unless a different <code>algorithm</code> is specified, this will be sha256 hash.</td>
+</tr>
+<tr>
+<td><code>algorithm</code></td>
+<td>No</td>
+<td><code>string</code></td>
+<td><code>sha256</code></td>
+<td>The hash algorithm to use. Repolinter supports any algorithm supported by <a href="https://nodejs.org/api/crypto.html#crypto_crypto_createhash_algorithm_options">crypto.createHash</a></td>
+</tr>
+<tr>
+<td><code>nocase</code></td>
+<td>No</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Set to <code>true</code> to perform a case insensitive search.</td>
 </tr>
 </tbody>
 </table>
@@ -883,7 +1058,7 @@ relative to the original file path as <code>/etc/repolinter/default.yaml</code>.
 <td>No</td>
 <td><code>boolean</code></td>
 <td><code>false</code></td>
-<td>Set to <code>true</code> to perform an case insensitive search.</td>
+<td>Set to <code>true</code> to perform a case insensitive search.</td>
 </tr>
 <tr>
 <td><code>succeed-on-non-exist</code></td>
@@ -903,6 +1078,7 @@ relative to the original file path as <code>/etc/repolinter/default.yaml</code>.
 </table>
 <h3><code>file-not-contents</code></h3>
 <p>Checks none of a given list of files match a given regular expression.</p>
+<p>Note: provide either <code>content</code> or <code>contents</code></p>
 <table>
 <thead>
 <tr>
@@ -923,10 +1099,17 @@ relative to the original file path as <code>/etc/repolinter/default.yaml</code>.
 </tr>
 <tr>
 <td><code>content</code></td>
-<td><strong>Yes</strong></td>
+<td><strong>Yes</strong> if <code>contents</code> is undefined</td>
 <td><code>string</code></td>
 <td></td>
 <td>The regular expression to check using <code>String#search</code>. This expression should not include the enclosing slashes and may need to be escaped to properly integrate with the JSON config (ex. <code>".+@.+\\..+"</code> for an email address).</td>
+</tr>
+<tr>
+<td><code>contents</code></td>
+<td><strong>Yes</strong> if <code>content</code> is undefined</td>
+<td><code>string[]</code></td>
+<td></td>
+<td>Regular expressions to check using <code>String#search</code>. This expression should not include the enclosing slashes and may need to be escaped to properly integrate with the JSON config (ex. <code>".+@.+\\..+"</code> for an email address).</td>
 </tr>
 <tr>
 <td><code>nocase</code></td>
@@ -983,7 +1166,7 @@ relative to the original file path as <code>/etc/repolinter/default.yaml</code>.
 <td>No</td>
 <td><code>boolean</code></td>
 <td><code>false</code></td>
-<td>Set to <code>true</code> to perform an case insensitive search.</td>
+<td>Set to <code>true</code> to perform a case insensitive search.</td>
 </tr>
 <tr>
 <td><code>dirs</code></td>
@@ -1047,7 +1230,7 @@ relative to the original file path as <code>/etc/repolinter/default.yaml</code>.
 <td>No</td>
 <td><code>boolean</code></td>
 <td><code>false</code></td>
-<td>Set to <code>true</code> to perform an case insensitive search on the files. This will not effect the case sensitivity of <code>patterns</code>.</td>
+<td>Set to <code>true</code> to perform a case insensitive search on the files. This will not effect the case sensitivity of <code>patterns</code>.</td>
 </tr>
 <tr>
 <td><code>succeed-on-non-exist</code></td>
@@ -1205,6 +1388,35 @@ a bit time consuming, depending on the size of the Git history.</p>
 </tr>
 </tbody>
 </table>
+<h3><code>large-file</code></h3>
+<p>Check if a list of files' size on the file system that is larger than provided size.</p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Required</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>globsAll</code></td>
+<td><strong>Yes</strong></td>
+<td><code>string[]</code></td>
+<td></td>
+<td>A list of globs to get files for. This rule passes if all of the files returned by the globs match are smaller than <em>size</em> or if no files are returned.</td>
+</tr>
+<tr>
+<td><code>size</code></td>
+<td><strong>Yes</strong></td>
+<td><code>number</code></td>
+<td></td>
+<td>files sizes larger than this number (bytes) will fail this rule.</td>
+</tr>
+</tbody>
+</table>
 <h3><code>json-schema-passes</code></h3>
 <p>Checks if a given file matches a provided <a href="https://json-schema.org/">JSON schema</a>. This check is performed using <a href="https://ajv.js.org/">AJV</a>.</p>
 <table>
@@ -1237,7 +1449,7 @@ a bit time consuming, depending on the size of the Git history.</p>
 <td>No</td>
 <td><code>boolean</code></td>
 <td><code>false</code></td>
-<td>Set to <code>true</code> to perform an case insensitive search.</td>
+<td>Set to <code>true</code> to perform a case insensitive search.</td>
 </tr>
 <tr>
 <td><code>human-readable-message</code></td>
@@ -1623,7 +1835,7 @@ This axiom will return a list of <a href="https://spdx.org/licenses/">license id
 <p>This axiom uses GitHub's <a href="https://github.com/github/linguist">linguist</a> to detect programming languages in the current repository. To use this axiom, linguist must be installed in the system <code>PATH</code> or in the same directory as Repolinter. This axiom will return a lowercase list of programming languages from <a href="https://github.com/github/linguist/blob/master/lib/linguist/languages.yml">this list of supported languages</a>.</p>
 <p>An example of using this axiom:</p>
 <h3><code>packagers</code></h3>
-<p>This axiom detects the projects packaging system by looking for project metadata files such as the <a href="https://docs.npmjs.com/files/package.json">package.json</a>. The list of detectable packaging systems can be found in the <a href="../../axioms/packagers.js">axiom source</a>.</p>
+<p>This axiom detects the projects packaging system by looking for project metadata files such as the <a href="https://docs.npmjs.com/files/package.json">package.json</a>. The list of detectable packaging systems can be found in the <a href="../axioms/packagers.js">axiom source</a>.</p>
 
     <div class='pre p1 fill-light mt0'>Axioms</div>
   
@@ -4755,6 +4967,1152 @@ returned.</p>
   
   <div class='clearfix'>
     
+    <h3 class='fl m0' id='filehash'>
+      fileHash
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Check if a file matches a certain cryptographic hash.</p>
+
+    <div class='pre p1 fill-light mt0'>fileHash(fs: FileSystem, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;Result></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>fs</span> <code class='quiet'>(FileSystem)</code>
+	    A filesystem object configured with filter paths and target directories
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    The rule configuration
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;Result></code>:
+        The lint rule result
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='anyfilecontents'>
+      anyFileContents
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Check that at least one file within a list contains a regular expression.</p>
+
+    <div class='pre p1 fill-light mt0'>anyFileContents(fs: FileSystem, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;Result></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>fs</span> <code class='quiet'>(FileSystem)</code>
+	    A filesystem object configured with filter paths and target directories
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    The rule configuration
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;Result></code>:
+        The lint rule result
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='creategithubissue'>
+      createGithubIssue
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Create a GitHub Issue on the targeted repository specifically for this broken rule.</p>
+
+    <div class='pre p1 fill-light mt0'>createGithubIssue(fs: FileSystem, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, targets: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>, dryRun: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;Result></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>fs</span> <code class='quiet'>(FileSystem)</code>
+	    A filesystem object configured with filter paths and target directories
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    The rule configuration
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>targets</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
+	    The files to modify (will be overridden by options if present)
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>dryRun</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>
+            = <code>false</code>)</code>
+	    If true, repolinter will report suggested fixes, but will make no disk modifications.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;Result></code>:
+        The fix result
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='gettopcontributors'>
+      getTopContributors
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Retrieve the top contributor by commit count of a repository.</p>
+
+    <div class='pre p1 fill-light mt0'>getTopContributors(targetOrg: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, targetRepository: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>targetOrg</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    Target Organization
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>targetRepository</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    Target Repository
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>:
+        Returns array of contributors.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='createissueongithub'>
+      createIssueOnGithub
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Create an issue on GitHub with labels and all on the target repository.</p>
+
+    <div class='pre p1 fill-light mt0'>createIssueOnGithub(options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, contributors: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>>, contributorSelectIndex: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    The rule configuration.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>contributors</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>>)</code>
+	    array of contributors
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>contributorSelectIndex</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>
+            = <code>0</code>)</code>
+	    counter for which assignee was selected
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>:
+        Returns issue after adding it via the GitHub API.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='updateissueongithub'>
+      updateIssueOnGithub
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Update specific issue on Github.</p>
+
+    <div class='pre p1 fill-light mt0'>updateIssueOnGithub(options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, issueNumber: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, assignees: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>>, assigneeSelectIndex: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    The rule configuration.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>issueNumber</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The number of the issue we should update.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>assignees</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>>)</code>
+	    array of contributors
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>assigneeSelectIndex</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>
+            = <code>0</code>)</code>
+	    index for which assignee was selected
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>:
+        Returns issue after updating it via the Github API.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='commentongithubissue'>
+      commentOnGithubIssue
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Comment on a specific issue on Github.</p>
+
+    <div class='pre p1 fill-light mt0'>commentOnGithubIssue(options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, issueNumber: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    The rule configuration.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>issueNumber</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The number of the issue we should update.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>:
+        Returns issue after commenting on it via the Github API.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='prepareworkingenvironment'>
+      prepareWorkingEnvironment
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Prepare our working environment.
+Check if environment variables are set.</p>
+
+    <div class='pre p1 fill-light mt0'>prepareWorkingEnvironment(dryRun: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>dryRun</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    Enable this if you want to test without configuring environment variables
+Set constants like targetOrg and targetRepository and initialize OctoKit.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='hasbypasslabelbeenapplied'>
+      hasBypassLabelBeenApplied
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Check if the bypass label has been found.</p>
+
+    <div class='pre p1 fill-light mt0'>hasBypassLabelBeenApplied(options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, labels: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    The rule configuration.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>labels</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
+	    The labels of the issue to match against.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>:
+        True if bypass label is found, false otherwise.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='retrieveruleidentifier'>
+      retrieveRuleIdentifier
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Check if the unique rule id can be found in the issue body.</p>
+
+    <div class='pre p1 fill-light mt0'>retrieveRuleIdentifier(body: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>body</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The body of the issue.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>:
+        Returns the rule identifier as a string that was found in the issue body.
+
+      
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>null</code>:
+        Returns null if no rule identifier can be found in the issue body.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='ensureaddedgithublabels'>
+      ensureAddedGithubLabels
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Adds the labels to this target repository on Github.</p>
+
+    <div class='pre p1 fill-light mt0'>ensureAddedGithubLabels(labelsToCheckOrCreate: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>, targetOrg: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, targetRepository: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, octoKit: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>labelsToCheckOrCreate</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>)</code>
+	    An array of labels that we should check and possibly add.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>targetOrg</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    Organization/Owner of the repository.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>targetRepository</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    Name of the repository.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>octoKit</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    Instance of Octokit used to call Github API.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='doeslabelexistonrepo'>
+      doesLabelExistOnRepo
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Checks if a label exists on a repository
+Returns true if it exists, false otherwise.</p>
+
+    <div class='pre p1 fill-light mt0'>doesLabelExistOnRepo(targetOrg: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, repo: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, label: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, octokit: any, octoKit: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>targetOrg</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    Organization/Owner of the repository.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>repo</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    Name of the repository.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>label</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    Label to check for.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>octokit</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>octoKit</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    Instance of Octokit used to call GitHub API.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code>:
+        True if label is found, false otherwise.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='findexistingrepolinterissues'>
+      findExistingRepolinterIssues
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Find existing repolinter issues, open and closed.
+These issues are found by looking for labels and creator</p>
+
+    <div class='pre p1 fill-light mt0'>findExistingRepolinterIssues(options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, targetOrg: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, targetRepository: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, octokit: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>): null</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    The rule configuration.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>targetOrg</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    Organization/Owner of the repository.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>targetRepository</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    Name of the repository.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>octokit</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    Instance of Octokit used to call Github API.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>null</code>:
+        Returns null if no issue can be found.
+
+      
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>></code>:
+        Returns array of issues if issues can be found that match the criteria. This array is sorted by
+last created date. Latest created issues show up first.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
     <h3 class='fl m0' id='symbolformatter'>
       SymbolFormatter
     </h3>
@@ -4796,7 +6154,7 @@ returned.</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>formatResult(result, ruleName, errorSymbol, okSymbol)</span>
+            <span class='code strong strong truncate'>formatResult(result, ruleName, rulePolicyUrl, rulePolicyInfo, errorSymbol, okSymbol)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -4806,7 +6164,7 @@ returned.</p>
 
   <p>Format a FormatResult object into a line of human-readable text.</p>
 
-    <div class='pre p1 fill-light mt0'>formatResult(result: Result, ruleName: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, errorSymbol: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, okSymbol: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></div>
+    <div class='pre p1 fill-light mt0'>formatResult(result: Result, ruleName: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, rulePolicyUrl: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, rulePolicyInfo: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, errorSymbol: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, okSymbol: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></div>
   
   
 
@@ -4834,6 +6192,26 @@ returned.</p>
           <div>
             <span class='code bold'>ruleName</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    The name of the rule this result is from
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>rulePolicyUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            = <code>undefined</code>)</code>
+	    The policyUrl of the rule this result is from
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>rulePolicyInfo</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            = <code>undefined</code>)</code>
+	    The policyInfo of the rule this result is from
 
           </div>
           
