@@ -8,26 +8,6 @@ const FileSystem = require('../../lib/file_system')
 describe('rule', () => {
   describe('any_file_contents', () => {
     const anyFileContents = require('../../rules/any-file-contents')
-    const mockGit = {
-      branchLocal() {
-        return { current: 'master' }
-      },
-      getRemotes() {
-        return [{ name: 'origin' }]
-      },
-      addConfig() {
-        return Promise.resolve
-      },
-      remote() {
-        return Promise.resolve
-      },
-      branch() {
-        return { all: ['master'] }
-      },
-      checkout() {
-        return Promise.resolve
-      }
-    }
 
     it('returns passes if requested file contents exists in exactly one file', async () => {
       /** @type {any} */
@@ -45,7 +25,7 @@ describe('rule', () => {
         content: '[abcdef][oO0][^q]'
       }
 
-      const actual = await anyFileContents(mockfs, ruleopts, mockGit)
+      const actual = await anyFileContents(mockfs, ruleopts)
       expect(actual.passed).to.equal(true)
       expect(actual.targets).to.have.length(3)
       expect(actual.targets[2]).to.deep.include({
@@ -70,7 +50,7 @@ describe('rule', () => {
         content: '[abcdef][oO0][^q]'
       }
 
-      const actual = await anyFileContents(mockfs, ruleopts, mockGit)
+      const actual = await anyFileContents(mockfs, ruleopts)
 
       expect(actual.passed).to.equal(true)
       expect(actual.targets).to.have.length(3)
@@ -104,7 +84,7 @@ describe('rule', () => {
         content: '[abcdef][oO0][^q]'
       }
 
-      const actual = await anyFileContents(mockfs, ruleopts, mockGit)
+      const actual = await anyFileContents(mockfs, ruleopts)
       expect(actual.passed).to.equal(false)
       expect(actual.targets).to.have.length(3)
       expect(actual.targets[0]).to.deep.include({
@@ -133,7 +113,7 @@ describe('rule', () => {
         'fail-on-non-existent': true
       }
 
-      const actual = await anyFileContents(mockfs, ruleopts, mockGit)
+      const actual = await anyFileContents(mockfs, ruleopts)
 
       expect(actual.passed).to.equal(false)
     })
@@ -150,7 +130,7 @@ describe('rule', () => {
         patterns: ['something'],
         'fail-on-non-existent': true
       }
-      const actual = await anyFileContents(fs, ruleopts, mockGit)
+      const actual = await anyFileContents(fs, ruleopts)
       expect(actual.passed).to.equal(false)
     })
   })

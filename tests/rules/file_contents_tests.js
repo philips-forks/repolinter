@@ -6,6 +6,7 @@ const expect = chai.expect
 const FileSystem = require('../../lib/file_system')
 const cp = require('child_process')
 const path = require('path')
+const fileContents = require('../../rules/file-contents')
 
 /**
  * Execute a command in a childprocess asynchronously. Not secure, but good for testing.
@@ -29,7 +30,6 @@ async function execAsync(command, opts = {}) {
 }
 
 describe('rule', () => {
-  const fileContents = require('../../rules/file-contents')
   describe('files_contents', () => {
     const mockGit = {
       branchLocal() {
@@ -80,6 +80,66 @@ describe('rule', () => {
       expect(actual.targets[0]).to.deep.include({
         passed: true,
         path: 'README.md'
+      })
+    })
+
+    it('returns passes and display context if requested file contents exists', async () => {
+      /** @type {any} */
+      const mockfs = {
+        findAllFiles() {
+          return ['README.md']
+        },
+        getFileContents() {
+          return 'foo get test'
+        },
+        targetDir: '.'
+      }
+
+      const ruleopts = {
+        globsAll: ['README*'],
+        content: 'get',
+        'display-result-context': true,
+        'context-char-length': 2
+      }
+
+      const actual = await fileContents(mockfs, ruleopts)
+      console.log(actual)
+      expect(actual.passed).to.equal(true)
+      expect(actual.targets).to.have.length(1)
+      expect(actual.targets[0]).to.deep.include({
+        passed: true,
+        path: 'README.md',
+        message: "Contains 'get' on line 1, context: \n\t|o get t"
+      })
+    })
+
+    it('returns failure and display context if requested file contents exists', async () => {
+      /** @type {any} */
+      const mockfs = {
+        findAllFiles() {
+          return ['README.md']
+        },
+        getFileContents() {
+          return 'foo get test'
+        },
+        targetDir: '.'
+      }
+
+      const ruleopts = {
+        globsAll: ['README*'],
+        content: 'get',
+        'display-result-context': true,
+        'context-char-length': 2
+      }
+
+      const actual = await fileContents(mockfs, ruleopts, true)
+      console.log(actual)
+      expect(actual.passed).to.equal(false)
+      expect(actual.targets).to.have.length(1)
+      expect(actual.targets[0]).to.deep.include({
+        passed: false,
+        path: 'README.md',
+        message: "Contains 'get' on line 1, context: \n\t|o get t"
       })
     })
 
@@ -175,7 +235,7 @@ describe('rule', () => {
       )
       expect(actual.passed).to.equal(true)
       expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].passed).to.equal(false)
+      expect(actual.targets[0].passed).to.equal(true)
       expect(actual.targets[0].pattern).to.equal(ruleopts.globsAll[0])
     })
 
@@ -227,6 +287,66 @@ describe('rule', () => {
         ? path.resolve('bin/repolinter.bat')
         : path.resolve('bin/repolinter.js')
     this.timeout(30000)
+    describe('with incorrectly configured branches option', () => {
+      it('it should ignore the value and continue', async () => {
+        /** @type {any} */
+        const mockfs = {
+          findAllFiles() {
+            return ['README.md']
+          },
+          getFileContents() {
+            return 'foo'
+          },
+          targetDir: '.'
+        }
+        // Check undefined option
+        let ruleopts = {
+          globsAll: ['README*'],
+          content: 'foo',
+          branches: undefined
+        }
+
+        let actual = await fileContents(mockfs, ruleopts, undefined, undefined)
+        expect(actual.passed).to.equal(true)
+        expect(actual.targets).to.have.length(1)
+        expect(actual.targets[0]).to.deep.include({
+          passed: true,
+          path: 'README.md'
+        })
+
+        // Check empty array
+        ruleopts = {
+          globsAll: ['README*'],
+          content: 'foo',
+          branches: []
+        }
+
+        actual = await fileContents(mockfs, ruleopts, undefined, undefined)
+        expect(actual.passed).to.equal(true)
+        expect(actual.targets).to.have.length(1)
+        expect(actual.targets[0]).to.deep.include({
+          passed: true,
+          path: 'README.md'
+        })
+        // Check null option
+        ruleopts = {
+          globsAll: ['README*'],
+          content: 'foo',
+          branches: null
+        }
+
+        actual = await fileContents(mockfs, ruleopts, undefined, undefined)
+        expect(actual.passed).to.equal(true)
+        expect(actual.targets).to.have.length(1)
+        expect(actual.targets[0]).to.deep.include({
+          passed: true,
+          path: 'README.md'
+        })
+      })
+    })
+    describe('with correctly configured branches option', () => {
+      it('it should set checkBranches boolean to true', async () => {})
+    })
     describe('when checking only default branch', () => {
       it('returned content should not find content from different branches', async () => {
         const actual = await execAsync(

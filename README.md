@@ -15,7 +15,7 @@ We are working on getting (some) of these changes merged back into upstream. Tim
 
 ## Installation
 
-Repolinter requires [Node.JS](https://nodejs.org/en/) >= v10 to function properly. Once Node.JS is installed, you can install Repolinter using `npm`:
+Repolinter requires [Node.JS](https://nodejs.org/en/) >= v12 to function properly. Once Node.JS is installed, you can install Repolinter using `npm`:
 
 ```sh
 npm install -g repolinter

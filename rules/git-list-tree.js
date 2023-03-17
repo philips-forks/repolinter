@@ -10,6 +10,7 @@ const GitHelper = require('../lib/git_helper')
 /**
  * @param targetDir
  * @param commit
+ * @ignore
  */
 function gitFilesAtCommit(targetDir, commit) {
   const args = ['-C', targetDir, 'ls-tree', '-r', '--name-only', commit]
@@ -19,6 +20,7 @@ function gitFilesAtCommit(targetDir, commit) {
 /**
  * @param fileSystem
  * @param options
+ * @ignore
  */
 function listFiles(fileSystem, options) {
   const files = []
@@ -50,6 +52,7 @@ function listFiles(fileSystem, options) {
  * @param {FileSystem} fs A filesystem object configured with filter paths and target directories
  * @param {object} options The rule configuration
  * @returns {Result} The lint rule result
+ * @ignore
  */
 function gitListTree(fs, options) {
   // backwards compatibility with blacklist
