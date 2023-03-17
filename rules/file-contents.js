@@ -570,25 +570,6 @@ async function fileContentsWithBranchOption(
           return previous
         }, [])
     }
-    // const ruleOutcomeArray = await Promise.all(
-    //   files.map(async file => {
-    //     const fileContents = await fs.getFileContents(file)
-    //     if (!fileContents) return null
-    //
-    //     const regexp = new RegExp(options.content, options.flags)
-    //     const passed = fileContents.search(regexp) >= 0
-    //     const message = `${
-    //       passed ? 'Contains' : "Doesn't contain"
-    //     } ${getContent(options)}`
-    //
-    //     return {
-    //       passed: not ? !passed : passed,
-    //       path: file,
-    //       message
-    //     }
-    //   })
-    // )
-    // results = results.concat(ruleOutcomeArray)
   }
   if (switchedBranch) {
     // Make sure we are back using the default branch
