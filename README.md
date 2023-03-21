@@ -10,6 +10,7 @@ Lint open source repositories for common issues.
 - New rule that checks if content exists within a file (any-file-contents, <https://github.com/philips-forks/repolinter/pull/18>)
 - Minor optimization if you have a very large repository (lots of commits) so it doesn't do a full checkout. (<https://github.com/philips-forks/repolinter/pull/12>)
 - Add ability to specify which Git branches to search for with the file-contents and any-file-content rules.
+- Rules: ``(any)-file-(not)-content`` can now specifify if they should be executed in sequential mode or not. The option ``sequentialOnly`` should be used for this. Default is ``false``. This feature is useful if you check different branches, which is not possible to do without affecting other rule checks.
 
 We are working on getting (some) of these changes merged back into upstream. Time is a limiting factor here..
 
