@@ -457,7 +457,7 @@ async function runRuleset(ruleset, targets, fileSystem, dryRun) {
     }
     let fixresult
     try {
-      const fixFunc = Fixes[r.fixType]()
+      const fixFunc = Fixes[r.fixType]
       fixresult = await fixFunc(fileSystem, r.fixConfig, fixTargets, dryRun)
     } catch (e) {
       results.push(
