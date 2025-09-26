@@ -135,9 +135,22 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
             true
           )
         } else {
+          if (options.DoNotReopen === true) {
+            return new Result(
+              `DoNotReopen rule processed - no action taken on closed Github Issue ${issue.number} (DoNotReopen=true)`,
+              [],
+              true
+            )
+          }
+
           try {
-            // Issue should include the broken rule, a message in the body and a label.
             await updateIssueOnGithub(options, issue.number, contributors)
+            await commentOnGithubIssue(options, issue.number)
+            return new Result(
+              `Github Issue ${issue.number} re-opened as there seems to be regression!`,
+              [],
+              true
+            )
           } catch (e) {
             return new Result(
               `Something went wrong when trying to update issue id: ${issue.number}: ${e.message}`,
@@ -145,12 +158,6 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
               false
             )
           }
-          await commentOnGithubIssue(options, issue.number)
-          return new Result(
-            `Github Issue ${issue.number} re-opened as there seems to be regression!`,
-            [],
-            true
-          )
         }
       } else {
         console.log(

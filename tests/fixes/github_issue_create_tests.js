@@ -582,5 +582,123 @@ describe('fixes', () => {
         })
       })
     })
+
+    describe('DoNotReopen functionality', () => {
+      afterEach(() => {
+        nock.cleanAll()
+      })
+
+      describe('when DoNotReopen is true', () => {
+        it('should not reopen or comment on closed issues', async () => {
+          const closedIssue = [
+            {
+              number: 123,
+              state: 'closed',
+              title: 'Test Issue',
+              body: 'Test body\n Unique rule set ID: test-rule-123',
+              labels: [{ name: 'continuous-compliance' }]
+            }
+          ]
+
+          const doNotReopenOptions = {
+            ...validOptions,
+            DoNotReopen: true,
+            uniqueRuleId: 'test-rule-123'
+          }
+
+          nock('https://api.github.com')
+            .get(
+              `/repos/test/tester-repo/issues?labels=continuous-compliance%2Cautomated&state=all&sort=created&direction=desc`
+            )
+            .reply(200, closedIssue)
+
+          // Mock label existence checks
+          nock('https://api.github.com')
+            .get(`/repos/test/tester-repo/labels/continuous-compliance`)
+            .reply(200)
+          nock('https://api.github.com')
+            .get(`/repos/test/tester-repo/labels/automated`)
+            .reply(200)
+          nock('https://api.github.com')
+            .get(`/repos/test/tester-repo/labels/CC%3A%20Bypass`)
+            .reply(200)
+
+          // Mock contributors call that happens before DoNotReopen check
+          nock('https://api.github.com')
+            .get(`/repos/test/tester-repo/contributors`)
+            .reply(200, [])
+
+          const result = await GithubIssueCreate(
+            null,
+            doNotReopenOptions,
+            [],
+            true
+          )
+
+          expect(result).to.be.an.instanceof(Result)
+          expect(result.passed).to.equal(true)
+          expect(result.message).to.include(
+            'DoNotReopen rule processed - no action taken on closed Github Issue 123 (DoNotReopen=true)'
+          )
+        })
+      })
+
+      describe('when DoNotReopen is false or undefined', () => {
+        it('should reopen and comment on closed issues', async () => {
+          const closedIssue = [
+            {
+              number: 456,
+              state: 'closed',
+              title: 'Test Issue',
+              body: 'Test body\n Unique rule set ID: test-rule-456',
+              labels: [{ name: 'continuous-compliance' }]
+            }
+          ]
+
+          const normalOptions = {
+            ...validOptions,
+            DoNotReopen: false,
+            uniqueRuleId: 'test-rule-456'
+          }
+
+          nock('https://api.github.com')
+            .get(
+              `/repos/test/tester-repo/issues?labels=continuous-compliance%2Cautomated&state=all&sort=created&direction=desc`
+            )
+            .reply(200, closedIssue)
+
+          // Mock label existence checks (multiple calls allowed)
+          nock('https://api.github.com')
+            .persist()
+            .get(`/repos/test/tester-repo/labels/continuous-compliance`)
+            .reply(200)
+          nock('https://api.github.com')
+            .persist()
+            .get(`/repos/test/tester-repo/labels/automated`)
+            .reply(200)
+          nock('https://api.github.com')
+            .persist()
+            .get(`/repos/test/tester-repo/labels/CC%3A%20Bypass`)
+            .reply(200)
+          nock('https://api.github.com')
+            .get(`/repos/test/tester-repo/contributors`)
+            .reply(200, [])
+          nock('https://api.github.com')
+            .patch(`/repos/test/tester-repo/issues/456`)
+            .reply(200, { number: 456, state: 'open' })
+          nock('https://api.github.com')
+            .post(`/repos/test/tester-repo/issues/456/comments`)
+            .reply(200, { id: 1, body: normalOptions.commentBody })
+
+          const result = await GithubIssueCreate(null, normalOptions, [], true)
+
+          expect(result).to.be.an.instanceof(Result)
+          expect(result.passed).to.equal(true)
+          expect(result.message).to.include(
+            'Github Issue 456 re-opened as there seems to be regression!'
+          )
+        })
+      })
+    })
   })
 })
