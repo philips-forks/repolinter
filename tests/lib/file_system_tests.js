@@ -3,6 +3,8 @@
 
 const path = require('path')
 const chai = require('chai')
+const chaiAsPromised = require('chai-as-promised')
+chai.use(chaiAsPromised)
 const expect = chai.expect
 const realFs = require('fs')
 
@@ -192,18 +194,38 @@ describe('lib', () => {
       })
     })
 
-    describe('setFileContents', async () => {
+    describe('setFileContents', () => {
       const fs = new FileSystem(__dirname)
       const filePath = path.resolve(__dirname, 'text_file_for_test.txt')
-      const contents = await realFs.promises.readFile(filePath)
+      const testFilePath = path.resolve(__dirname, 'notAFile')
+      let contents
+
+      before(async () => {
+        contents = await realFs.promises.readFile(filePath)
+      })
+
+      afterEach(async () => {
+        // Clean up test file if it was created
+        try {
+          await realFs.promises.unlink(testFilePath)
+        } catch (e) {
+          // File doesn't exist, which is fine
+        }
+      })
 
       it('should throw an error if the file does not exist', async () => {
-        expect(() => fs.getFileContents('notAFile')).to.throw()
+        // writeFile will create the file, but we want to test error handling
+        // Test with a directory path that has insufficient permissions or similar
+        // Since Node 20 creates files automatically, we need a different error condition
+        // Test with invalid path characters or a read-only location
+        const invalidPath =
+          '/nonexistent/directory/that/cannot/be/created/file.txt'
+        await expect(fs.setFileContents(invalidPath, 'content')).to.be.rejected
       })
 
       it('should change the contents of a file', async () => {
         const expected = 'somefilecontents\nmorecontents\n'
-        fs.setFileContents('text_file_for_test.txt', expected)
+        await fs.setFileContents('text_file_for_test.txt', expected)
         const fileContents = await realFs.promises.readFile(filePath, 'utf8')
         const realFileContents = fileContents.replace(/\r/g, '')
         expect(realFileContents).to.equal(expected)
