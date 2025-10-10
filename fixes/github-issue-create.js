@@ -135,9 +135,9 @@ async function createGithubIssue(fs, options, targets, dryRun = false) {
             true
           )
         } else {
-          if (options.DoNotReopen === true) {
+          if (options.doNotReopen === true) {
             return new Result(
-              `DoNotReopen rule processed - no action taken on closed Github Issue ${issue.number} (DoNotReopen=true)`,
+              `doNotReopen rule processed - no action taken on closed Github Issue ${issue.number} (doNotReopen=true)`,
               [],
               true
             )

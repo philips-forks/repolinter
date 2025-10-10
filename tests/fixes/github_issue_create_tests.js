@@ -583,12 +583,12 @@ describe('fixes', () => {
       })
     })
 
-    describe('DoNotReopen functionality', () => {
+    describe('doNotReopen functionality', () => {
       afterEach(() => {
         nock.cleanAll()
       })
 
-      describe('when DoNotReopen is true', () => {
+      describe('when doNotReopen is true', () => {
         it('should not reopen or comment on closed issues', async () => {
           const closedIssue = [
             {
@@ -602,7 +602,7 @@ describe('fixes', () => {
 
           const doNotReopenOptions = {
             ...validOptions,
-            DoNotReopen: true,
+            doNotReopen: true,
             uniqueRuleId: 'test-rule-123'
           }
 
@@ -623,7 +623,7 @@ describe('fixes', () => {
             .get(`/repos/test/tester-repo/labels/CC%3A%20Bypass`)
             .reply(200)
 
-          // Mock contributors call that happens before DoNotReopen check
+          // Mock contributors call that happens before doNotReopen check
           nock('https://api.github.com')
             .get(`/repos/test/tester-repo/contributors`)
             .reply(200, [])
@@ -638,12 +638,12 @@ describe('fixes', () => {
           expect(result).to.be.an.instanceof(Result)
           expect(result.passed).to.equal(true)
           expect(result.message).to.include(
-            'DoNotReopen rule processed - no action taken on closed Github Issue 123 (DoNotReopen=true)'
+            'doNotReopen rule processed - no action taken on closed Github Issue 123 (doNotReopen=true)'
           )
         })
       })
 
-      describe('when DoNotReopen is false or undefined', () => {
+      describe('when doNotReopen is false or undefined', () => {
         it('should reopen and comment on closed issues', async () => {
           const closedIssue = [
             {
@@ -657,7 +657,7 @@ describe('fixes', () => {
 
           const normalOptions = {
             ...validOptions,
-            DoNotReopen: false,
+            doNotReopen: false,
             uniqueRuleId: 'test-rule-456'
           }
 
