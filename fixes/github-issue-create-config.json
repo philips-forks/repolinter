@@ -11,7 +11,13 @@
       "type": "string"
     },
     "commentBody": {
-      "type": "string"
+      "type": "string",
+      "description": "Comment to add when reopening issues."
+    },
+    "doNotReopen": {
+      "type": "boolean",
+      "default": false,
+      "description": "When set to true, closed issues will not be reopened or commented on. When false, normal reopening behavior applies."
     },
     "issueTitle": {
       "type": "string"
